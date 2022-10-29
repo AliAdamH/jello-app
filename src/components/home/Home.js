@@ -2,6 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import BoardList from '../boardlist/BoardList';
 
+const HomeContainer = styled.div`
+  margin-top: 64px;
+  padding: 0.5rem;
+  width: min(100%, 1400px);
+  background-color: lightpink;
+  margin-inline: auto;
+`;
+
 const Container = styled.div`
   display: flex;
   width: 90%;
@@ -48,15 +56,17 @@ const BoardContainer = styled.div`
 
 function Home() {
   return (
-    <Container>
-      <SideBar>h</SideBar>
-      <MainContent>
-        <Title>Current Workspace Boards</Title>
-        <BoardContainer>
-          <BoardList />
-        </BoardContainer>
-      </MainContent>
-    </Container>
+    <HomeContainer>
+      <Container>
+        <SideBar>h</SideBar>
+        <MainContent>
+          <Title>Current Workspace Boards</Title>
+          <BoardContainer>
+            <BoardList />
+          </BoardContainer>
+        </MainContent>
+      </Container>
+    </HomeContainer>
   );
 }
 

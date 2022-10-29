@@ -16,6 +16,8 @@ const Title = styled.h3`
   background-color: #eee;
 `;
 const TaskList = styled.div`
+  min-height: 32px;
+  flex: 1;
   padding: 0.5rem;
   transition: background-color 0.2s ease;
   background-color: ${(props) => (props.isDraggingOver ? 'skyblue' : 'white')};

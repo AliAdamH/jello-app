@@ -51,6 +51,12 @@ const MiscButton = styled.button`
   }
 `;
 
+const InnerList = React.memo((props) => {
+  return props.tasks.map((task, index) => (
+    <Card key={task.id} task={task} index={index} />
+  ));
+});
+
 const Column = (props) => {
   return (
     <>
@@ -65,9 +71,7 @@ const Column = (props) => {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  {props.tasks.map((task, index) => (
-                    <Card key={task.id} task={task} index={index} />
-                  ))}
+                  <InnerList tasks={props.tasks} />
                   {provided.placeholder}
                 </TaskList>
               )}

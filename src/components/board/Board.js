@@ -20,6 +20,12 @@ const BoardContainer = styled.div`
   align-items: start;
 `;
 
+const ColumnsWrapper = React.memo((props) => {
+  const { column, taskMap, index } = props;
+  const tasks = column.taskIds.map((taskId) => taskMap[taskId]);
+  return <Column column={column} tasks={tasks} index={index} />;
+});
+
 function Board() {
   const [data, setData] = useState(initialData);
 
@@ -115,15 +121,12 @@ function Board() {
             >
               {data.columnOrder.map((col, idx) => {
                 const column = data.columns[col];
-                const tasks = column.taskIds.map((taskId) => {
-                  return data.tasks[taskId];
-                });
 
                 return (
-                  <Column
+                  <ColumnsWrapper
                     key={column.id}
                     column={column}
-                    tasks={tasks}
+                    taskMap={data.tasks}
                     index={idx}
                   />
                 );

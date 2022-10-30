@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
@@ -28,6 +28,13 @@ const ColumnsWrapper = React.memo((props) => {
 
 function Board() {
   const [data, setData] = useState(initialData);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/v1/boards')
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.error(error));
+  }, []);
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;

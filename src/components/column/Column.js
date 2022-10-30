@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Card from '../card/Card';
-import { Droppable } from '@hello-pangea/dnd';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 const Container = styled.div`
   border: 1px solid lightgray;
   border-radius: 0.375rem;
@@ -54,27 +54,31 @@ const MiscButton = styled.button`
 const Column = (props) => {
   return (
     <>
-      <Container>
-        <Title>{props.column.title}</Title>
-        <Droppable droppableId={props.column.id}>
-          {(provided, snapshot) => (
-            <TaskList
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              isDraggingOver={snapshot.isDraggingOver}
-            >
-              {props.tasks.map((task, index) => (
-                <Card key={task.id} task={task} index={index} />
-              ))}
-              {provided.placeholder}
-            </TaskList>
-          )}
-        </Droppable>
-        <Footer>
-          <NewCardButton>+ Add a new card</NewCardButton>
-          <MiscButton> &#9883; </MiscButton>
-        </Footer>
-      </Container>
+      <Draggable draggableId={props.column.id} index={props.index}>
+        {(provided) => (
+          <Container ref={provided.innerRef} {...provided.draggableProps}>
+            <Title {...provided.dragHandleProps}>{props.column.title}</Title>
+            <Droppable type="task" droppableId={props.column.id}>
+              {(provided, snapshot) => (
+                <TaskList
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  isDraggingOver={snapshot.isDraggingOver}
+                >
+                  {props.tasks.map((task, index) => (
+                    <Card key={task.id} task={task} index={index} />
+                  ))}
+                  {provided.placeholder}
+                </TaskList>
+              )}
+            </Droppable>
+            <Footer>
+              <NewCardButton>+ Add a new card</NewCardButton>
+              <MiscButton> &#9883; </MiscButton>
+            </Footer>
+          </Container>
+        )}
+      </Draggable>
     </>
   );
 };

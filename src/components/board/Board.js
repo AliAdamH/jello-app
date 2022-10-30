@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import background from '../../background-example.jpg';
-import { DragDropContext } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import initalData from '../../initial-data';
 import Column from '../column/Column';
 import initialData from '../../initial-data';
@@ -15,7 +15,7 @@ const BoardContainer = styled.div`
   padding-inline: 2rem;
   padding-block: 0.625rem;
   display: flex;
-  gap: 2rem;
+  gap: 0.5rem;
   overflow-x: auto;
   align-items: start;
 `;
@@ -24,7 +24,7 @@ function Board() {
   const [data, setData] = useState(initialData);
 
   const handleDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source, draggableId, type } = result;
 
     if (!destination) {
       return;
@@ -34,6 +34,20 @@ function Board() {
       destination.index === source.index &&
       destination.droppableId === source.droppableId
     ) {
+      return;
+    }
+
+    if (type === 'column') {
+      const newColumnOrder = [...data.columnOrder];
+      newColumnOrder.splice(source.index, 1);
+      newColumnOrder.splice(destination.index, 0, draggableId);
+
+      const newState = {
+        ...data,
+        columnOrder: newColumnOrder,
+      };
+      setData(newState);
+
       return;
     }
 
@@ -91,18 +105,34 @@ function Board() {
 
   return (
     <>
-      <BoardContainer imageLink={background}>
-        <DragDropContext onDragEnd={handleDragEnd}>
-          {data.columnOrder.map((col, idx) => {
-            const column = data.columns[col];
-            const tasks = column.taskIds.map((taskId) => {
-              return data.tasks[taskId];
-            });
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="columns" type="column" direction="horizontal">
+          {(provided) => (
+            <BoardContainer
+              imageLink={background}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {data.columnOrder.map((col, idx) => {
+                const column = data.columns[col];
+                const tasks = column.taskIds.map((taskId) => {
+                  return data.tasks[taskId];
+                });
 
-            return <Column key={column.id} column={column} tasks={tasks} />;
-          })}
-        </DragDropContext>
-      </BoardContainer>
+                return (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    tasks={tasks}
+                    index={idx}
+                  />
+                );
+              })}
+              {provided.placeholder}
+            </BoardContainer>
+          )}
+        </Droppable>
+      </DragDropContext>
     </>
   );
 }

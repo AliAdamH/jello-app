@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
-import initalData from '../../initial-data';
 import Column from '../column/Column';
-import initialData from '../../initial-data';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -20,20 +18,34 @@ const BoardContainer = styled.div`
   align-items: start;
 `;
 
+const filterTasks = (tasks, taskToRemoveId) => {
+  const deepCopy = JSON.parse(JSON.stringify(tasks));
+  return Object.keys(deepCopy)
+    .filter((key) => key !== taskToRemoveId)
+    .reduce((obj, key) => {
+      return (obj[key] = { ...obj, [key]: deepCopy[key] });
+    }, {});
+};
+
 const ColumnsWrapper = React.memo((props) => {
   const { column, taskMap, index } = props;
-  const tasks = column.taskIds.map((taskId) => taskMap[taskId]);
+  const tasks = column.taskOrders.map((taskId) => taskMap[taskId]);
   return <Column column={column} tasks={tasks} index={index} />;
 });
 
 function Board() {
-  const [data, setData] = useState(initialData);
-
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetch('http://localhost:3000/api/v1/boards')
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.error(error));
+    if (!data) {
+      fetch('http://localhost:3000/api/v1/boards')
+        .then((response) => response.json())
+        .then((data) => {
+          setData(data);
+          setLoading(false);
+        })
+        .catch((error) => console.error(error));
+    }
   }, []);
 
   const handleDragEnd = (result) => {
@@ -51,13 +63,13 @@ function Board() {
     }
 
     if (type === 'column') {
-      const newColumnOrder = [...data.columnOrder];
+      const newColumnOrder = [...data.colOrderIds];
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
 
       const newState = {
         ...data,
-        columnOrder: newColumnOrder,
+        colOrderIds: newColumnOrder,
       };
       setData(newState);
 
@@ -68,12 +80,12 @@ function Board() {
     const finish = data.columns[destination.droppableId];
 
     if (start === finish) {
-      const newTaskIds = Array.from(start.taskIds);
+      const newTaskIds = Array.from(start.taskOrders);
       newTaskIds.splice(source.index, 1);
       newTaskIds.splice(destination.index, 0, draggableId);
       const newColumn = {
         ...start,
-        taskIds: newTaskIds,
+        taskOrders: newTaskIds,
       };
 
       const newData = {
@@ -88,20 +100,23 @@ function Board() {
       return;
     }
 
-    const startTaskIds = [...start.taskIds];
+    const startTaskIds = [...start.taskOrders];
     startTaskIds.splice(source.index, 1);
-
+    const movedTask = start.tasks[draggableId];
+    const newTasks = filterTasks(start.tasks, draggableId);
     const newStart = {
       ...start,
-      taskIds: startTaskIds,
+      taskOrders: startTaskIds,
+      tasks: newTasks,
     };
 
-    const finishTaskIds = [...finish.taskIds];
+    const finishTaskIds = [...finish.taskOrders];
     finishTaskIds.splice(destination.index, 0, draggableId);
-
+    const newFinishTasks = { ...finish.tasks, [draggableId]: movedTask };
     const newFinish = {
       ...finish,
-      taskIds: finishTaskIds,
+      taskOrders: finishTaskIds,
+      tasks: newFinishTasks,
     };
 
     const newState = {
@@ -118,31 +133,33 @@ function Board() {
 
   return (
     <>
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="columns" type="column" direction="horizontal">
-          {(provided) => (
-            <BoardContainer
-              imageLink={background}
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {data.columnOrder.map((col, idx) => {
-                const column = data.columns[col];
+      {!loading && (
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="columns" type="column" direction="horizontal">
+            {(provided) => (
+              <BoardContainer
+                imageLink={background}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {data.colOrderIds.map((col, idx) => {
+                  const column = data.columns[col];
 
-                return (
-                  <ColumnsWrapper
-                    key={column.id}
-                    column={column}
-                    taskMap={data.tasks}
-                    index={idx}
-                  />
-                );
-              })}
-              {provided.placeholder}
-            </BoardContainer>
-          )}
-        </Droppable>
-      </DragDropContext>
+                  return (
+                    <ColumnsWrapper
+                      key={column.id}
+                      column={column}
+                      taskMap={column.tasks}
+                      index={idx}
+                    />
+                  );
+                })}
+                {provided.placeholder}
+              </BoardContainer>
+            )}
+          </Droppable>
+        </DragDropContext>
+      )}
     </>
   );
 }

@@ -27,7 +27,7 @@ const Card = (props) => {
           ref={provided.innerRef}
           isDragging={snapshot.isDragging}
         >
-          {props.task.content}
+          {props.task.title}
         </CardContainer>
       )}
     </Draggable>

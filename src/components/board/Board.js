@@ -28,9 +28,16 @@ const filterTasks = (tasks, taskToRemoveId) => {
 };
 
 const ColumnsWrapper = React.memo((props) => {
-  const { column, taskMap, index } = props;
+  const { column, taskMap, index, handleCreateTask } = props;
   const tasks = column.taskOrders.map((taskId) => taskMap[taskId]);
-  return <Column column={column} tasks={tasks} index={index} />;
+  return (
+    <Column
+      column={column}
+      tasks={tasks}
+      index={index}
+      createTask={handleCreateTask}
+    />
+  );
 });
 
 function Board() {
@@ -189,6 +196,46 @@ function Board() {
     setData(newState);
   };
 
+  const handleCreateTask = async (columnId, value) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        task: { column_id: columnId, title: value },
+      }),
+    };
+
+    let apiTaskResponse = await fetch(
+      'http://localhost:3000/api/v1/tasks',
+      requestOptions
+    );
+    let createdTask = await apiTaskResponse.json();
+    const newColumn = { ...data.columns[columnId] };
+
+    console.log(createdTask);
+
+    const newTasks = {
+      ...newColumn.tasks,
+      [createdTask.id]: createdTask,
+    };
+    const newTaskOrders = [...newColumn.taskOrders, Number(createdTask.id)];
+    console.log(newTaskOrders);
+    const updatedColumn = {
+      ...newColumn,
+      tasks: newTasks,
+      taskOrders: newTaskOrders,
+    };
+    setData((previousState) => {
+      return {
+        ...previousState,
+        columns: {
+          ...previousState.columns,
+          [updatedColumn.id]: updatedColumn,
+        },
+      };
+    });
+  };
+
   return (
     <>
       {!loading && (
@@ -208,6 +255,7 @@ function Board() {
                       key={column.id}
                       column={column}
                       taskMap={column.tasks}
+                      handleCreateTask={handleCreateTask}
                       index={idx}
                     />
                   );

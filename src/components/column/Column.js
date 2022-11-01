@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Card from '../card/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
+import NewTask from '../card/NewTask';
 const Container = styled.div`
   border: 1px solid lightgray;
   border-radius: 0.375rem;
@@ -58,6 +59,17 @@ const InnerList = React.memo((props) => {
 });
 
 const Column = (props) => {
+  const [isHavingNewTask, setIsHavingNewTask] = useState(false);
+
+  const removeNewTask = () => {
+    setIsHavingNewTask(false);
+  };
+
+  const addTask = (titleValue) => {
+    props.createTask(props.column.id, titleValue);
+    setIsHavingNewTask(false);
+  };
+
   return (
     <>
       <Draggable draggableId={props.column.id} index={props.index}>
@@ -77,8 +89,21 @@ const Column = (props) => {
               )}
             </Droppable>
             <Footer>
-              <NewCardButton>+ Add a new card</NewCardButton>
-              <MiscButton> &#9883; </MiscButton>
+              {!isHavingNewTask ? (
+                <>
+                  <NewCardButton onClick={() => setIsHavingNewTask(true)}>
+                    + Add a new card
+                  </NewCardButton>
+                  <MiscButton> &#9883; </MiscButton>
+                </>
+              ) : (
+                <>
+                  <NewTask
+                    handleFocusOutOfNewTask={removeNewTask}
+                    handleTaskCreation={addTask}
+                  />
+                </>
+              )}
             </Footer>
           </Container>
         )}

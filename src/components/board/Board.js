@@ -69,6 +69,23 @@ function Board() {
     );
   };
 
+  const handleTaskInnerReorder = (newColumn) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        column: {
+          id: newColumn.id,
+          task_orders: newColumn.taskOrders,
+        },
+      }),
+    };
+    fetch(
+      'http://localhost:3000/api/v1/order_tasks/' + newColumn.id,
+      requestOptions
+    ).catch((error) => console.error(error));
+  };
+
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -109,6 +126,7 @@ function Board() {
         taskOrders: newTaskIds,
       };
 
+      handleTaskInnerReorder(newColumn);
       const newData = {
         ...data,
         columns: {

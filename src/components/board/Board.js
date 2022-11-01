@@ -48,6 +48,27 @@ function Board() {
     }
   }, []);
 
+  const handleTaskMovement = (taskId, targetColumn, initialColumn) => {
+    const requestBody = {
+      to_col: {
+        id: targetColumn.id,
+        task_orders: targetColumn.taskOrders,
+      },
+      from_col: {
+        id: initialColumn.id,
+        task_orders: initialColumn.taskOrders,
+      },
+    };
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    };
+    fetch('http://localhost:3000/api/v1/tasks/' + taskId, requestOptions).catch(
+      (error) => console.error(error)
+    );
+  };
+
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -119,6 +140,7 @@ function Board() {
       tasks: newFinishTasks,
     };
 
+    handleTaskMovement(draggableId, newFinish, newStart);
     const newState = {
       ...data,
       columns: {

@@ -86,6 +86,23 @@ function Board() {
     ).catch((error) => console.error(error));
   };
 
+  const handleColumnOrdering = (newBoard) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        board: {
+          id: newBoard.id,
+          col_order_ids: newBoard.colOrderIds,
+        },
+      }),
+    };
+    fetch(
+      'http://localhost:3000/api/v1/order_columns/' + newBoard.id,
+      requestOptions
+    ).catch((error) => console.error(error));
+  };
+
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -109,6 +126,7 @@ function Board() {
         ...data,
         colOrderIds: newColumnOrder,
       };
+      handleColumnOrdering(newState);
       setData(newState);
 
       return;

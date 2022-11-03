@@ -3,19 +3,24 @@ import styled from 'styled-components';
 import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../column/Column';
+import NewColumn from '../column/NewColumn';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
   background-position: center;
   background-size: cover;
   margin-top: 64px;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 84px);
   padding-inline: 2rem;
   padding-block: 0.625rem;
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
   align-items: start;
+
+  & > * {
+    flex-shrink: 0;
+  }
 `;
 
 const filterTasks = (tasks, taskToRemoveId) => {
@@ -236,6 +241,34 @@ function Board() {
     });
   };
 
+  const handleNewColumn = async (columnTitle) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        column: { title: columnTitle, board_id: data.id },
+      }),
+    };
+
+    let apiColumnResponse = await fetch(
+      'http://localhost:3000/api/v1/columns',
+      requestOptions
+    );
+    let createdColumn = await apiColumnResponse.json();
+    console.log(createdColumn);
+
+    setData((previous) => {
+      return {
+        ...previous,
+        columns: {
+          ...previous.columns,
+          [createdColumn.id]: createdColumn,
+        },
+        colOrderIds: [...previous.colOrderIds, createdColumn.id],
+      };
+    });
+  };
+
   return (
     <>
       {!loading && (
@@ -261,6 +294,7 @@ function Board() {
                   );
                 })}
                 {provided.placeholder}
+                <NewColumn handleNewColumn={handleNewColumn} />
               </BoardContainer>
             )}
           </Droppable>

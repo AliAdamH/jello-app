@@ -2,34 +2,46 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 
 const TitleText = styled.h2`
-  padding: 1rem;
-  font-size: 1.125rem;
+  font-size: 1.5rem;
+`;
+
+const EditInput = styled.input`
+  font-size: 1.25rem;
+  padding-inline: 0.5rem;
+  padding-block: 0.2rem;
+  border: 1px solid lightgray;
 `;
 
 function EditableTitle(props) {
   const [isBeingEdited, setIsBeingEdited] = useState(false);
-  const [updatedTitle, setUpdatedTitle] = useState(props.title);
-  const watchInput = (e) => {
-    console.log(e);
-    setUpdatedTitle(e.target.value);
+  const initialTitle = useRef(props.title);
+
+  const checkIfChanged = (e) => {
+    if (e.target.value === initialTitle.current) {
+      console.log('SAME TITLE!');
+    } else {
+      console.log('YOU HAVE CHANGED THE TITLE');
+    }
+    setIsBeingEdited(false);
   };
 
   return (
     <>
+      <small>In column: {props.columnTitle}</small>
       {isBeingEdited ? (
-        <input type={'text'} value={updatedTitle} onKeyUp={watchInput} />
+        <EditInput
+          autoFocus={true}
+          type={'text'}
+          defaultValue={initialTitle.current}
+          onBlur={checkIfChanged}
+        />
       ) : (
-        <TitleText onClick={() => setIsBeingEdited(true)}>
-          {updatedTitle}
-        </TitleText>
+        <div>
+          <TitleText onClick={() => setIsBeingEdited(true)}>
+            {initialTitle.current}
+          </TitleText>
+        </div>
       )}
-      <small
-        style={{
-          marginLeft: '1rem',
-        }}
-      >
-        In column: {props.columnTitle}
-      </small>
     </>
   );
 }

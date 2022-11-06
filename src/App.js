@@ -10,43 +10,6 @@ import Navbar from './components/navbar/Navbar';
 import styled from 'styled-components';
 
 function App() {
-  // const [data, setData] = useState(initialData);
-
-  // const handleDragEnd = (result) => {
-  //   const { destination, source, draggableId } = result;
-
-  //   if (!destination) {
-  //     return;
-  //   }
-
-  //   if (
-  //     destination.index === source.index &&
-  //     destination.droppableId === source.droppableId
-  //   ) {
-  //     return;
-  //   }
-
-  //   const column = data.columns[source.droppableId];
-  //   const newTaskIds = Array.from(column.taskIds);
-  //   newTaskIds.splice(source.index, 1);
-  //   newTaskIds.splice(destination.index, 0, draggableId);
-
-  //   const newColumn = {
-  //     ...column,
-  //     taskIds: newTaskIds,
-  //   };
-
-  //   const newData = {
-  //     ...data,
-  //     columns: {
-  //       ...data.columns,
-  //       [newColumn.id]: newColumn,
-  //     },
-  //   };
-
-  //   setData(newData);
-  // };
-
   return (
     <div className="App">
       <Navbar />

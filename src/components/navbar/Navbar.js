@@ -2,7 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 const Header = styled.nav`
-  background-color: purple;
+  background: radial-gradient(
+    circle at 1.8% 4.8%,
+    rgb(17, 23, 58) 0%,
+    rgb(58, 85, 148) 90%
+  );
   height: 64px;
   position: fixed;
   width: 100%;

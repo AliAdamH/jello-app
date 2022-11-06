@@ -10,7 +10,7 @@ const BoardContainer = styled.div`
   background-position: center;
   background-size: cover;
   margin-top: 64px;
-  height: calc(100vh - 84px);
+  height: calc(100vh - 64px);
   padding-inline: 2rem;
   padding-block: 0.625rem;
   display: flex;

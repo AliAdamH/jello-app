@@ -4,8 +4,9 @@ import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../column/Column';
 import NewColumn from '../column/NewColumn';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
+  fetchBoardData,
   fullTaskMovement,
   taskInnerReorder,
   updateColumnOrder,
@@ -53,8 +54,22 @@ const ColumnsWrapper = React.memo((props) => {
 
 function Board() {
   const [data, setData] = useState(null);
+  const bData = useSelector((state) => state.boards.data);
+  const dataStatus = useSelector((state) => state.boards.status);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (dataStatus === 'idle') {
+      dispatch(fetchBoardData());
+    }
+  }, [dataStatus, dispatch]);
+
+  useEffect(() => {
+    if (dataStatus === 'success') {
+      console.log(bData);
+    }
+  }, [dataStatus, bData]);
 
   useEffect(() => {
     if (!data) {

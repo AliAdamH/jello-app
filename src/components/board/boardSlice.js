@@ -1,12 +1,34 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-const initialState = {};
+const initialState = {
+  data: {},
+  status: 'idle',
+  errors: null,
+};
 
 const boardSlice = createSlice({
   name: 'boards',
   initialState,
   reducers: {},
+  extraReducers(builder) {
+    builder
+      .addCase(fetchBoardData.pending, (state, action) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchBoardData.fulfilled, (state, action) => {
+        state.status = 'success';
+        state.data = action.payload;
+      });
+  },
 });
+
+export const fetchBoardData = createAsyncThunk(
+  'boards/fetchBoardData',
+  async (boardId, _) => {
+    const response = await fetch(`http://localhost:3000/api/v1/boards`);
+    return await response.json();
+  }
+);
 
 export const updateColumnOrder = createAsyncThunk(
   'boards/updateColumnOrder',

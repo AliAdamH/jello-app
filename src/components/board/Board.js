@@ -5,7 +5,11 @@ import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../column/Column';
 import NewColumn from '../column/NewColumn';
 import { useDispatch } from 'react-redux';
-import { taskInnerReorder, updateColumnOrder } from './boardSlice';
+import {
+  fullTaskMovement,
+  taskInnerReorder,
+  updateColumnOrder,
+} from './boardSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -63,27 +67,6 @@ function Board() {
         .catch((error) => console.error(error));
     }
   }, []);
-
-  const handleTaskMovement = (taskId, targetColumn, initialColumn) => {
-    const requestBody = {
-      to_col: {
-        id: targetColumn.id,
-        task_orders: targetColumn.taskOrders,
-      },
-      from_col: {
-        id: initialColumn.id,
-        task_orders: initialColumn.taskOrders,
-      },
-    };
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-    };
-    fetch('http://localhost:3000/api/v1/tasks/' + taskId, requestOptions).catch(
-      (error) => console.error(error)
-    );
-  };
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
@@ -177,8 +160,13 @@ function Board() {
     };
 
     // Server side update.
-    handleTaskMovement(draggableId, newFinish, newStart);
-
+    dispatch(
+      fullTaskMovement({
+        taskId: draggableId,
+        targetColumn: newFinish,
+        initialColumn: newStart,
+      })
+    );
     // UI Optimistic Update.
     const newState = {
       ...data,

@@ -51,6 +51,33 @@ export const taskInnerReorder = createAsyncThunk(
   }
 );
 
+export const fullTaskMovement = createAsyncThunk(
+  'board/fullTaskMovement',
+  async ({ taskId, targetColumn, initialColumn }, _) => {
+    const requestBody = {
+      to_col: {
+        id: targetColumn.id,
+        task_orders: targetColumn.taskOrders,
+      },
+      from_col: {
+        id: initialColumn.id,
+        task_orders: initialColumn.taskOrders,
+      },
+    };
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    };
+    await fetch(
+      'http://localhost:3000/api/v1/tasks/' + taskId,
+      requestOptions
+    ).catch((error) => console.error(error));
+
+    console.log('WOO full task movement');
+  }
+);
+
 export const {} = boardSlice.actions;
 
 export default boardSlice.reducer;

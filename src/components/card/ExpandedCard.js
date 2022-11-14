@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import CardActivityFeed from './CardActivityFeed';
 import EditableDescription from './EditableDescription';
 import EditableTitle from './EditableTitle';
 import ExpandedCardActions from './ExpandedCardActions';
+import { fetchTask } from './taskSlice';
 
 const Expanded = styled.div`
   border-radius: 0.375rem;
@@ -70,6 +72,11 @@ const Right = styled.div`
 `;
 
 function ExpandedCard({ title, description, close }) {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchTask('33'));
+  }, [dispatch]);
+
   return (
     <>
       <Expanded>

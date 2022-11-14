@@ -118,10 +118,12 @@ function Board() {
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
+    // User has dragged the card outside of any droppable.
     if (!destination) {
       return;
     }
 
+    // User has lifted the card but dropped it at the same place.
     if (
       destination.index === source.index &&
       destination.droppableId === source.droppableId
@@ -129,6 +131,7 @@ function Board() {
       return;
     }
 
+    // User has dragged a column.
     if (type === 'column') {
       const newColumnOrder = [...data.colOrderIds];
       newColumnOrder.splice(source.index, 1);
@@ -144,9 +147,12 @@ function Board() {
       return;
     }
 
+    // User has dragged a card and changed its position.
+
     const start = data.columns[source.droppableId];
     const finish = data.columns[destination.droppableId];
 
+    // User has dragged the card in the same column.
     if (start === finish) {
       const newTaskIds = Array.from(start.taskOrders);
       newTaskIds.splice(source.index, 1);
@@ -169,6 +175,8 @@ function Board() {
       return;
     }
 
+    // User has dragged the card from a column to another.
+
     const startTaskIds = [...start.taskOrders];
     startTaskIds.splice(source.index, 1);
     const movedTask = start.tasks[draggableId];
@@ -188,7 +196,10 @@ function Board() {
       tasks: newFinishTasks,
     };
 
+    // Server side update.
     handleTaskMovement(draggableId, newFinish, newStart);
+
+    // UI Optimistic Update.
     const newState = {
       ...data,
       columns: {

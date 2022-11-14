@@ -4,6 +4,8 @@ import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../column/Column';
 import NewColumn from '../column/NewColumn';
+import { useDispatch } from 'react-redux';
+import { updateColumnOrder } from './boardSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -48,6 +50,8 @@ const ColumnsWrapper = React.memo((props) => {
 function Board() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (!data) {
       fetch('http://localhost:3000/api/v1/boards')
@@ -98,23 +102,6 @@ function Board() {
     ).catch((error) => console.error(error));
   };
 
-  const handleColumnOrdering = (newBoard) => {
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        board: {
-          id: newBoard.id,
-          col_order_ids: newBoard.colOrderIds,
-        },
-      }),
-    };
-    fetch(
-      'http://localhost:3000/api/v1/order_columns/' + newBoard.id,
-      requestOptions
-    ).catch((error) => console.error(error));
-  };
-
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -141,7 +128,12 @@ function Board() {
         ...data,
         colOrderIds: newColumnOrder,
       };
-      handleColumnOrdering(newState);
+      dispatch(
+        updateColumnOrder({
+          boardId: newState.id,
+          newColOrderIds: newColumnOrder,
+        })
+      );
       setData(newState);
 
       return;

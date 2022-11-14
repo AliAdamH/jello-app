@@ -5,7 +5,7 @@ import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../column/Column';
 import NewColumn from '../column/NewColumn';
 import { useDispatch } from 'react-redux';
-import { updateColumnOrder } from './boardSlice';
+import { taskInnerReorder, updateColumnOrder } from './boardSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -85,23 +85,6 @@ function Board() {
     );
   };
 
-  const handleTaskInnerReorder = (newColumn) => {
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        column: {
-          id: newColumn.id,
-          task_orders: newColumn.taskOrders,
-        },
-      }),
-    };
-    fetch(
-      'http://localhost:3000/api/v1/order_tasks/' + newColumn.id,
-      requestOptions
-    ).catch((error) => console.error(error));
-  };
-
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -154,7 +137,12 @@ function Board() {
         taskOrders: newTaskIds,
       };
 
-      handleTaskInnerReorder(newColumn);
+      dispatch(
+        taskInnerReorder({
+          columnId: newColumn.id,
+          taskOrderIds: newTaskIds,
+        })
+      );
       const newData = {
         ...data,
         columns: {

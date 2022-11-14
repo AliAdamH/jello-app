@@ -29,6 +29,28 @@ export const updateColumnOrder = createAsyncThunk(
   }
 );
 
+export const taskInnerReorder = createAsyncThunk(
+  'boards/TaskInnerReorder',
+  async ({ columnId, taskOrderIds }, _) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        column: {
+          id: columnId,
+          task_orders: taskOrderIds,
+        },
+      }),
+    };
+    await fetch(
+      'http://localhost:3000/api/v1/order_tasks/' + columnId,
+      requestOptions
+    ).catch((error) => console.error(error));
+
+    console.log('WOO INNER ASK REORDER');
+  }
+);
+
 export const {} = boardSlice.actions;
 
 export default boardSlice.reducer;

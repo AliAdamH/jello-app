@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchBoardData,
   fullTaskMovement,
+  optimisticColumnDrag,
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
@@ -96,17 +97,19 @@ function Board() {
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
 
-      const newState = {
-        ...data,
-        colOrderIds: newColumnOrder,
-      };
+      // const newState = {
+      //   ...data,
+      //   colOrderIds: newColumnOrder,
+      // };
+
+      dispatch(optimisticColumnDrag(newColumnOrder));
+
       dispatch(
         updateColumnOrder({
-          boardId: newState.id,
+          boardId: data.id,
           newColOrderIds: newColumnOrder,
         })
       );
-      setData(newState);
 
       return;
     }

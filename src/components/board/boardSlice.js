@@ -9,7 +9,11 @@ const initialState = {
 const boardSlice = createSlice({
   name: 'boards',
   initialState,
-  reducers: {},
+  reducers: {
+    optimisticColumnDrag(state, action) {
+      state.data.colOrderIds = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchBoardData.pending, (state, action) => {
@@ -84,6 +88,7 @@ export const updateColumnOrder = createAsyncThunk(
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        // remove duplicated boardId ?
         board: {
           id: boardId,
           col_order_ids: newColOrderIds,
@@ -94,7 +99,6 @@ export const updateColumnOrder = createAsyncThunk(
       'http://localhost:3000/api/v1/order_columns/' + boardId,
       requestOptions
     ).catch((error) => console.error(error));
-    console.log('WOOO COL UPDATE !');
   }
 );
 
@@ -147,6 +151,6 @@ export const fullTaskMovement = createAsyncThunk(
   }
 );
 
-export const {} = boardSlice.actions;
+export const { optimisticColumnDrag } = boardSlice.actions;
 
 export default boardSlice.reducer;

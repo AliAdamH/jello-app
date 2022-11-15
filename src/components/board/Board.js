@@ -53,11 +53,14 @@ const ColumnsWrapper = React.memo((props) => {
 });
 
 function Board() {
-  const [data, setData] = useState(null);
-  const bData = useSelector((state) => state.boards.data);
+  const data = useSelector((state) => state.boards.data);
   const dataStatus = useSelector((state) => state.boards.status);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+
+  const setData = (_) => {
+    return null;
+  };
 
   useEffect(() => {
     if (dataStatus === 'idle') {
@@ -67,21 +70,9 @@ function Board() {
 
   useEffect(() => {
     if (dataStatus === 'success') {
-      console.log(bData);
+      setLoading(false);
     }
-  }, [dataStatus, bData]);
-
-  useEffect(() => {
-    if (!data) {
-      fetch('http://localhost:3000/api/v1/boards')
-        .then((response) => response.json())
-        .then((data) => {
-          setData(data);
-          setLoading(false);
-        })
-        .catch((error) => console.error(error));
-    }
-  }, []);
+  }, [dataStatus]);
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;

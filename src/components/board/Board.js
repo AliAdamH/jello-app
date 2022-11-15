@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchBoardData,
   fullTaskMovement,
+  newColumn,
   optimisticColumnDrag,
   optimisticFullTaskReorder,
   optimisticInnerTaskReorder,
@@ -224,31 +225,12 @@ function Board() {
   };
 
   const handleNewColumn = async (columnTitle) => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        column: { title: columnTitle, board_id: data.id },
-      }),
-    };
-
-    let apiColumnResponse = await fetch(
-      'http://localhost:3000/api/v1/columns',
-      requestOptions
+    dispatch(
+      newColumn({
+        columnTitle,
+        boardId: data.id,
+      })
     );
-    let createdColumn = await apiColumnResponse.json();
-    console.log(createdColumn);
-
-    setData((previous) => {
-      return {
-        ...previous,
-        columns: {
-          ...previous.columns,
-          [createdColumn.id]: createdColumn,
-        },
-        colOrderIds: [...previous.colOrderIds, createdColumn.id],
-      };
-    });
   };
 
   return (

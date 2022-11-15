@@ -18,9 +18,56 @@ const boardSlice = createSlice({
       .addCase(fetchBoardData.fulfilled, (state, action) => {
         state.status = 'success';
         state.data = action.payload;
+      })
+      .addCase(newColumn.fulfilled, (state, action) => {
+        const columnId = action.payload.id;
+        state.data.columns[columnId] = action.payload;
+        state.data.colOrderIds.push(columnId);
+      })
+      .addCase(createTask.fulfilled, (state, action) => {
+        // TODO: do things.
       });
   },
 });
+
+export const createTask = createAsyncThunk(
+  'boards/CreateTask',
+  async ({ title, columnId }, _) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        task: { column_id: columnId, title: title },
+      }),
+    };
+
+    let apiTaskResponse = await fetch(
+      'http://localhost:3000/api/v1/tasks',
+      requestOptions
+    );
+    return await apiTaskResponse.json();
+  }
+);
+
+export const newColumn = createAsyncThunk(
+  'boards/newColumn',
+  async ({ columnTitle, boardId }, _) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        column: { title: columnTitle, board_id: boardId },
+      }),
+    };
+
+    const response = await fetch(
+      'http://localhost:3000/api/v1/columns',
+      requestOptions
+    );
+
+    return await response.json();
+  }
+);
 
 export const fetchBoardData = createAsyncThunk(
   'boards/fetchBoardData',

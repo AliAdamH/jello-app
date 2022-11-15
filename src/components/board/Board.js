@@ -9,6 +9,8 @@ import {
   fetchBoardData,
   fullTaskMovement,
   optimisticColumnDrag,
+  optimisticFullTaskReorder,
+  optimisticInnerTaskReorder,
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
@@ -124,26 +126,20 @@ function Board() {
       const newTaskIds = Array.from(start.taskOrders);
       newTaskIds.splice(source.index, 1);
       newTaskIds.splice(destination.index, 0, draggableId);
-      const newColumn = {
-        ...start,
-        taskOrders: newTaskIds,
-      };
+
+      dispatch(
+        optimisticInnerTaskReorder({
+          columnId: start.id,
+          newTaskOrders: newTaskIds,
+        })
+      );
 
       dispatch(
         taskInnerReorder({
-          columnId: newColumn.id,
+          columnId: start.id,
           taskOrderIds: newTaskIds,
         })
       );
-      const newData = {
-        ...data,
-        columns: {
-          ...data.columns,
-          [newColumn.id]: newColumn,
-        },
-      };
-
-      setData(newData);
       return;
     }
 
@@ -167,6 +163,15 @@ function Board() {
       taskOrders: finishTaskIds,
       tasks: newFinishTasks,
     };
+    // UI Optimistic Update.
+    dispatch(
+      optimisticFullTaskReorder({
+        startColumnId: start.id,
+        finishColumnId: finish.id,
+        updatedStart: newStart,
+        updatedFinish: newFinish,
+      })
+    );
 
     // Server side update.
     dispatch(
@@ -176,17 +181,6 @@ function Board() {
         initialColumn: newStart,
       })
     );
-    // UI Optimistic Update.
-    const newState = {
-      ...data,
-      columns: {
-        ...data.columns,
-        [newStart.id]: newStart,
-        [newFinish.id]: newFinish,
-      },
-    };
-
-    setData(newState);
   };
 
   const handleCreateTask = async (columnId, value) => {

@@ -13,6 +13,16 @@ const boardSlice = createSlice({
     optimisticColumnDrag(state, action) {
       state.data.colOrderIds = action.payload;
     },
+    optimisticInnerTaskReorder(state, action) {
+      const { columnId, newTaskOrders } = action.payload;
+      state.data.columns[columnId].taskOrders = newTaskOrders;
+    },
+    optimisticFullTaskReorder(state, action) {
+      const { startColumnId, finishColumnId, updatedStart, updatedFinish } =
+        action.payload;
+      state.data.columns[startColumnId] = updatedStart;
+      state.data.columns[finishColumnId] = updatedFinish;
+    },
   },
   extraReducers(builder) {
     builder
@@ -151,6 +161,10 @@ export const fullTaskMovement = createAsyncThunk(
   }
 );
 
-export const { optimisticColumnDrag } = boardSlice.actions;
+export const {
+  optimisticColumnDrag,
+  optimisticInnerTaskReorder,
+  optimisticFullTaskReorder,
+} = boardSlice.actions;
 
 export default boardSlice.reducer;

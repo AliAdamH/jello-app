@@ -39,7 +39,9 @@ const boardSlice = createSlice({
         state.data.colOrderIds.push(columnId);
       })
       .addCase(createTask.fulfilled, (state, action) => {
-        // TODO: do things.
+        const { columnId, id } = action.payload;
+        state.data.columns[columnId].tasks[id] = action.payload;
+        state.data.columns[columnId].taskOrders.push(id);
       });
   },
 });
@@ -59,6 +61,7 @@ export const createTask = createAsyncThunk(
       'http://localhost:3000/api/v1/tasks',
       requestOptions
     );
+    console.log('WOO Created the task !');
     return await apiTaskResponse.json();
   }
 );

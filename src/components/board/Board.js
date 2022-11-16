@@ -6,6 +6,7 @@ import Column from '../column/Column';
 import NewColumn from '../column/NewColumn';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  createTask,
   fetchBoardData,
   fullTaskMovement,
   newColumn,
@@ -61,10 +62,6 @@ function Board() {
   const dataStatus = useSelector((state) => state.boards.status);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-
-  const setData = (_) => {
-    return null;
-  };
 
   useEffect(() => {
     if (dataStatus === 'idle') {
@@ -185,43 +182,12 @@ function Board() {
   };
 
   const handleCreateTask = async (columnId, value) => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        task: { column_id: columnId, title: value },
-      }),
-    };
-
-    let apiTaskResponse = await fetch(
-      'http://localhost:3000/api/v1/tasks',
-      requestOptions
+    dispatch(
+      createTask({
+        columnId,
+        title: value,
+      })
     );
-    let createdTask = await apiTaskResponse.json();
-    const newColumn = { ...data.columns[columnId] };
-
-    console.log(createdTask);
-
-    const newTasks = {
-      ...newColumn.tasks,
-      [createdTask.id]: createdTask,
-    };
-    const newTaskOrders = [...newColumn.taskOrders, Number(createdTask.id)];
-    console.log(newTaskOrders);
-    const updatedColumn = {
-      ...newColumn,
-      tasks: newTasks,
-      taskOrders: newTaskOrders,
-    };
-    setData((previousState) => {
-      return {
-        ...previousState,
-        columns: {
-          ...previousState.columns,
-          [updatedColumn.id]: updatedColumn,
-        },
-      };
-    });
   };
 
   const handleNewColumn = async (columnTitle) => {

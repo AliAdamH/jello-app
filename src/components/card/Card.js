@@ -57,12 +57,7 @@ const Card = (props) => {
         shouldCloseOnOverlayClick={true}
         onRequestClose={() => setExpanded(false)}
       >
-        <ExpandedCard
-          title={props.task.title}
-          description={props.task.description}
-          taskId={props.task.id}
-          close={() => setExpanded(false)}
-        />
+        <ExpandedCard taskId={props.task.id} close={() => setExpanded(false)} />
       </StyledModal>
     </>
   );

@@ -11,6 +11,7 @@ import {
   handleTitleChange,
   updateTask,
   resetTaskState,
+  handleDescriptionChange,
 } from './taskSlice';
 
 const Expanded = styled.div`
@@ -98,7 +99,8 @@ function ExpandedCard({ title, description, close, taskId }) {
   };
 
   const handleDescriptionUpdate = (newDescriptionValue) => {
-    return null;
+    dispatch(handleDescriptionChange(newDescriptionValue));
+    dispatch(updateTask());
   };
 
   useEffect(() => {
@@ -120,7 +122,10 @@ function ExpandedCard({ title, description, close, taskId }) {
                 columnTitle={'Test Column Title'}
                 handleTitleUpdate={handleTitleUpdate}
               />
-              <EditableDescription description={description} />
+              <EditableDescription
+                description={task.description}
+                handleDescriptionUpdate={handleDescriptionUpdate}
+              />
               <CardActivityFeed />
             </Left>
             <Right>

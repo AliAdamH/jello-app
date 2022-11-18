@@ -16,6 +16,9 @@ const taskSlice = createSlice({
     handleTitleChange(state, action) {
       state.task.title = action.payload;
     },
+    handleDescriptionChange(state, action) {
+      state.task.description = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchTask.fulfilled, (state, action) => {
@@ -51,6 +54,7 @@ export const updateTask = createAsyncThunk(
     await fetch('http://localhost:3000/api/v1/tasks', requestOptions);
   }
 );
-export const { handleTitleChange, resetTaskState } = taskSlice.actions;
+export const { handleTitleChange, resetTaskState, handleDescriptionChange } =
+  taskSlice.actions;
 
 export default taskSlice.reducer;

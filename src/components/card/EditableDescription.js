@@ -32,11 +32,17 @@ const ActionButton = styled.button`
   }
 `;
 
-function EditableDescription({ description }) {
+function EditableDescription({ description, handleDescriptionUpdate }) {
   const [isBeingEdited, setIsBeingEdited] = useState(false);
 
-  const handleSubmit = () => {
-    return null;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const descriptionTextValue = e.target.description.value;
+    if (descriptionTextValue !== description) {
+      handleDescriptionUpdate(descriptionTextValue);
+    }
+
+    setIsBeingEdited(false);
   };
 
   return (
@@ -58,7 +64,9 @@ function EditableDescription({ description }) {
       ) : (
         <>
           <p>{description}</p>
-          <ActionButton bgColor={'#ddd'}> Edit </ActionButton>
+          <ActionButton bgColor={'#ddd'} onClick={() => setIsBeingEdited(true)}>
+            Edit
+          </ActionButton>
         </>
       )}
     </>

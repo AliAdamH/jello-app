@@ -23,6 +23,20 @@ const boardSlice = createSlice({
       state.data.columns[startColumnId] = updatedStart;
       state.data.columns[finishColumnId] = updatedFinish;
     },
+    // Very bad thing to do, we need to restructure our slices.
+    taskTitleUpdate(state, action) {
+      const task = action.payload;
+      console.log('fired');
+      console.log(
+        'before: ',
+        state.data.columns[task.columnId].tasks[task.id].title
+      );
+      state.data.columns[task.columnId].tasks[task.id].title = task.title;
+      console.log(
+        'after',
+        state.data.columns[task.columnId].tasks[task.id].title
+      );
+    },
   },
   extraReducers(builder) {
     builder
@@ -156,7 +170,7 @@ export const fullTaskMovement = createAsyncThunk(
       body: JSON.stringify(requestBody),
     };
     await fetch(
-      'http://localhost:3000/api/v1/tasks/' + taskId,
+      'http://localhost:3000/api/v1/move_tasks/' + taskId,
       requestOptions
     ).catch((error) => console.error(error));
 
@@ -168,6 +182,7 @@ export const {
   optimisticColumnDrag,
   optimisticInnerTaskReorder,
   optimisticFullTaskReorder,
+  taskTitleUpdate,
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

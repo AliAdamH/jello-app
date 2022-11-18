@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const TitleText = styled.h2`
@@ -14,13 +14,10 @@ const EditInput = styled.input`
 
 function EditableTitle(props) {
   const [isBeingEdited, setIsBeingEdited] = useState(false);
-  const initialTitle = useRef(props.title);
 
   const checkIfChanged = (e) => {
-    if (e.target.value === initialTitle.current) {
-      console.log('SAME TITLE!');
-    } else {
-      console.log('YOU HAVE CHANGED THE TITLE');
+    if (e.target.value !== props.title) {
+      props.handleTitleUpdate(e.target.value);
     }
     setIsBeingEdited(false);
   };
@@ -32,13 +29,13 @@ function EditableTitle(props) {
         <EditInput
           autoFocus={true}
           type={'text'}
-          defaultValue={initialTitle.current}
+          defaultValue={props.title}
           onBlur={checkIfChanged}
         />
       ) : (
         <div>
           <TitleText onClick={() => setIsBeingEdited(true)}>
-            {initialTitle.current}
+            {props.title}
           </TitleText>
         </div>
       )}

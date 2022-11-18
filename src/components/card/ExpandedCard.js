@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import CardActivityFeed from './CardActivityFeed';
 import EditableDescription from './EditableDescription';
 import EditableTitle from './EditableTitle';
 import ExpandedCardActions from './ExpandedCardActions';
-import { fetchTask } from './taskSlice';
+import {
+  fetchTask,
+  handleTitleChange,
+  updateTask,
+  resetTaskState,
+} from './taskSlice';
 
 const Expanded = styled.div`
   border-radius: 0.375rem;
@@ -71,30 +76,50 @@ const Right = styled.div`
   width: 30%;
 `;
 
-function ExpandedCard({ title, description, close }) {
+function ExpandedCard({ title, description, close, taskId }) {
   const dispatch = useDispatch();
+  const status = useSelector((state) => state.tasks.status);
+  const taskData = useSelector((state) => state.tasks);
+
   useEffect(() => {
-    dispatch(fetchTask('33'));
+    dispatch(fetchTask(taskId));
+  }, [dispatch, taskId]);
+
+  const handleTitleUpdate = (newTitleValue) => {
+    dispatch(handleTitleChange(newTitleValue));
+    dispatch(updateTask());
+  };
+
+  useEffect(() => {
+    return () => dispatch(resetTaskState());
   }, [dispatch]);
 
   return (
     <>
-      <Expanded>
-        <Cover>
-          <ModalCloseButton onClick={() => close()}>x</ModalCloseButton>
-          <CoverChangeButton>Change</CoverChangeButton>
-        </Cover>
-        <Body>
-          <Left>
-            <EditableTitle title={title} columnTitle={'Test Column Title'} />
-            <EditableDescription description={description} />
-            <CardActivityFeed />
-          </Left>
-          <Right>
-            <ExpandedCardActions />
-          </Right>
-        </Body>
-      </Expanded>
+      {status === 'successful' ? (
+        <Expanded>
+          <Cover>
+            <ModalCloseButton onClick={() => close()}>x</ModalCloseButton>
+            <CoverChangeButton>Change</CoverChangeButton>
+          </Cover>
+          <Body>
+            <Left>
+              <EditableTitle
+                title={taskData.task.title}
+                columnTitle={'Test Column Title'}
+                handleTitleUpdate={handleTitleUpdate}
+              />
+              <EditableDescription description={description} />
+              <CardActivityFeed />
+            </Left>
+            <Right>
+              <ExpandedCardActions />
+            </Right>
+          </Body>
+        </Expanded>
+      ) : (
+        <div></div>
+      )}
     </>
   );
 }

@@ -60,6 +60,7 @@ const Card = (props) => {
         <ExpandedCard
           title={props.task.title}
           description={props.task.description}
+          taskId={props.task.id}
           close={() => setExpanded(false)}
         />
       </StyledModal>

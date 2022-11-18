@@ -26,16 +26,7 @@ const boardSlice = createSlice({
     // Very bad thing to do, we need to restructure our slices.
     taskTitleUpdate(state, action) {
       const task = action.payload;
-      console.log('fired');
-      console.log(
-        'before: ',
-        state.data.columns[task.columnId].tasks[task.id].title
-      );
       state.data.columns[task.columnId].tasks[task.id].title = task.title;
-      console.log(
-        'after',
-        state.data.columns[task.columnId].tasks[task.id].title
-      );
     },
   },
   extraReducers(builder) {

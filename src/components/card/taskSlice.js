@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { taskTitleUpdate } from '../board/boardSlice';
 
 const initialState = {
   task: null,
@@ -16,7 +15,6 @@ const taskSlice = createSlice({
     },
     handleTitleChange(state, action) {
       state.task.title = action.payload;
-      console.log(state.task.title);
     },
   },
   extraReducers(builder) {
@@ -34,8 +32,6 @@ export const fetchTask = createAsyncThunk(
       `http://localhost:3000/api/v1/tasks/${taskId}`
     );
     const taskData = await response.json();
-    console.log('Task successfully received', taskData);
-    console.log('Will update task slice state.');
     return taskData;
   }
 );
@@ -43,7 +39,7 @@ export const fetchTask = createAsyncThunk(
 // 1 - Add the update task thunk.
 export const updateTask = createAsyncThunk(
   'tasks/updateTaskTitle',
-  async (_, { dispatch, getState }) => {
+  async (_, { getState }) => {
     const currentTask = getState().tasks.task;
     const requestOptions = {
       method: 'PUT',
@@ -53,7 +49,6 @@ export const updateTask = createAsyncThunk(
       }),
     };
     await fetch('http://localhost:3000/api/v1/tasks', requestOptions);
-    dispatch(taskTitleUpdate(currentTask));
   }
 );
 export const { handleTitleChange, resetTaskState } = taskSlice.actions;

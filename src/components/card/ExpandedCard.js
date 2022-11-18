@@ -5,6 +5,7 @@ import CardActivityFeed from './CardActivityFeed';
 import EditableDescription from './EditableDescription';
 import EditableTitle from './EditableTitle';
 import ExpandedCardActions from './ExpandedCardActions';
+import { taskTitleUpdate } from '../board/boardSlice';
 import {
   fetchTask,
   handleTitleChange,
@@ -79,7 +80,7 @@ const Right = styled.div`
 function ExpandedCard({ title, description, close, taskId }) {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.tasks.status);
-  const taskData = useSelector((state) => state.tasks);
+  const task = useSelector((state) => state.tasks.task);
 
   useEffect(() => {
     dispatch(fetchTask(taskId));
@@ -88,6 +89,16 @@ function ExpandedCard({ title, description, close, taskId }) {
   const handleTitleUpdate = (newTitleValue) => {
     dispatch(handleTitleChange(newTitleValue));
     dispatch(updateTask());
+    dispatch(
+      taskTitleUpdate({
+        ...task,
+        title: newTitleValue,
+      })
+    );
+  };
+
+  const handleDescriptionUpdate = (newDescriptionValue) => {
+    return null;
   };
 
   useEffect(() => {
@@ -105,7 +116,7 @@ function ExpandedCard({ title, description, close, taskId }) {
           <Body>
             <Left>
               <EditableTitle
-                title={taskData.task.title}
+                title={task.title}
                 columnTitle={'Test Column Title'}
                 handleTitleUpdate={handleTitleUpdate}
               />

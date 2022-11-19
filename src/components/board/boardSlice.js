@@ -28,6 +28,11 @@ const boardSlice = createSlice({
       const task = action.payload;
       state.data.columns[task.columnId].tasks[task.id].title = task.title;
     },
+    taskCoverColorUpdate(state, action) {
+      const task = action.payload;
+      state.data.columns[task.columnId].tasks[task.id].coverColor =
+        task.coverColor;
+    },
   },
   extraReducers(builder) {
     builder
@@ -174,6 +179,7 @@ export const {
   optimisticInnerTaskReorder,
   optimisticFullTaskReorder,
   taskTitleUpdate,
+  taskCoverColorUpdate,
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

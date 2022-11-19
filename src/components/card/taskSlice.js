@@ -19,6 +19,9 @@ const taskSlice = createSlice({
     handleDescriptionChange(state, action) {
       state.task.description = action.payload;
     },
+    handleCoverColorChange(state, action) {
+      state.task.coverColor = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchTask.fulfilled, (state, action) => {
@@ -54,7 +57,11 @@ export const updateTask = createAsyncThunk(
     await fetch('http://localhost:3000/api/v1/tasks', requestOptions);
   }
 );
-export const { handleTitleChange, resetTaskState, handleDescriptionChange } =
-  taskSlice.actions;
+export const {
+  handleTitleChange,
+  resetTaskState,
+  handleDescriptionChange,
+  handleCoverColorChange,
+} = taskSlice.actions;
 
 export default taskSlice.reducer;

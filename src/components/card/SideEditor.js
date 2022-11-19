@@ -1,0 +1,35 @@
+import React from 'react';
+import CoverEditor from './CoverEditor';
+import TagsEditor from './TagsEditor';
+import styled from 'styled-components';
+
+const EditorCloseButton = styled.button`
+  margin-block: 0.25rem;
+  margin-left: auto;
+  padding-inline: 0.75rem;
+  padding-block: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: #eee;
+`;
+const sideEditorComponents = {
+  cover: CoverEditor,
+  tags: TagsEditor,
+};
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+function SideEditor({ editorToRender, closeEditor, task }) {
+  const ToRender = sideEditorComponents[editorToRender];
+  return (
+    <Container>
+      <ToRender closeEditor={closeEditor} />
+      <EditorCloseButton onClick={closeEditor}>Close</EditorCloseButton>
+    </Container>
+  );
+}
+
+export default SideEditor;

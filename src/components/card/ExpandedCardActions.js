@@ -34,16 +34,16 @@ const CardActionContainer = styled.div`
   padding: 1rem;
 `;
 
-function ExpandedCardActions() {
+function ExpandedCardActions({ openEditor }) {
   return (
     <CardActionContainer>
       <CardAction>
         <FaUsers /> Members
       </CardAction>
-      <CardAction>
+      <CardAction onClick={() => openEditor('cover')}>
         <FaImage /> Cover
       </CardAction>
-      <CardAction>
+      <CardAction onClick={() => openEditor('tags')}>
         <FaTags />
         Tags
       </CardAction>

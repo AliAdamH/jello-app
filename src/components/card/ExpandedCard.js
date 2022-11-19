@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import CardActivityFeed from './CardActivityFeed';
@@ -13,6 +13,7 @@ import {
   resetTaskState,
   handleDescriptionChange,
 } from './taskSlice';
+import SideEditor from './SideEditor';
 
 const Expanded = styled.div`
   border-radius: 0.375rem;
@@ -21,6 +22,7 @@ const Expanded = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: relative;
 `;
 
 const Cover = styled.div`
@@ -78,11 +80,23 @@ const Right = styled.div`
   width: 30%;
 `;
 
+const SideEditorContainer = styled.div`
+  position: absolute;
+  height: fit-content;
+  right: -200px;
+  width: 300px;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 0.375rem;
+  box-shadow: 0 0 1em rgba(0 0 0 / 0.6);
+`;
+
 function ExpandedCard({ title, description, close, taskId }) {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.tasks.status);
   const task = useSelector((state) => state.tasks.task);
-
+  const [sideEditorOpen, setSideEditorOpen] = useState(false);
+  const [editorContent, setEditorContent] = useState('cover');
   useEffect(() => {
     dispatch(fetchTask(taskId));
   }, [dispatch, taskId]);
@@ -107,6 +121,11 @@ function ExpandedCard({ title, description, close, taskId }) {
     return () => dispatch(resetTaskState());
   }, [dispatch]);
 
+  const handleEditorOpening = (component) => {
+    !sideEditorOpen && setSideEditorOpen(true);
+    setEditorContent(component);
+  };
+
   return (
     <>
       {status === 'successful' ? (
@@ -129,9 +148,19 @@ function ExpandedCard({ title, description, close, taskId }) {
               <CardActivityFeed />
             </Left>
             <Right>
-              <ExpandedCardActions />
+              <ExpandedCardActions openEditor={handleEditorOpening} />
             </Right>
           </Body>
+          {sideEditorOpen ? (
+            <SideEditorContainer>
+              <SideEditor
+                editorToRender={editorContent}
+                closeEditor={() => setSideEditorOpen(false)}
+              />
+            </SideEditorContainer>
+          ) : (
+            <></>
+          )}
         </Expanded>
       ) : (
         <div></div>

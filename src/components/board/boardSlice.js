@@ -35,6 +35,10 @@ const boardSlice = createSlice({
       state.data.columns[task.columnId].tasks[task.id].coverTextColor =
         task.coverTextColor;
     },
+    optimisticLabelUpdate(state, action) {
+      const updatedLabel = action.payload;
+      state.data.labels[updatedLabel.id] = updatedLabel;
+    },
   },
   extraReducers(builder) {
     builder
@@ -176,10 +180,29 @@ export const fullTaskMovement = createAsyncThunk(
   }
 );
 
+export const updateLabel = createAsyncThunk(
+  'boards/updateLabel',
+  async (label, { dispatch }) => {
+    console.log(label);
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        label,
+      }),
+    };
+
+    await fetch('http://localhost:3000/api/v1/labels', requestOptions).catch(
+      (error) => console.error(error)
+    );
+  }
+);
+
 export const {
   optimisticColumnDrag,
   optimisticInnerTaskReorder,
   optimisticFullTaskReorder,
+  optimisticLabelUpdate,
   taskTitleUpdate,
   taskCoverColorUpdate,
 } = boardSlice.actions;

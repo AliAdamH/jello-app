@@ -154,6 +154,7 @@ function TagsEditor() {
   const handleLabelEdition = (label, actionType) => {
     setEditIsActive(true);
     setLabelToEdit(label);
+    setSelectedNewColor(label.color);
     setActionType(actionType);
   };
   const handleLabelEditingEnd = () => {

@@ -35,10 +35,6 @@ const boardSlice = createSlice({
       state.data.columns[task.columnId].tasks[task.id].coverTextColor =
         task.coverTextColor;
     },
-    optimisticLabelUpdate(state, action) {
-      const updatedLabel = action.payload;
-      state.data.labels[updatedLabel.id] = updatedLabel;
-    },
   },
   extraReducers(builder) {
     builder
@@ -58,10 +54,6 @@ const boardSlice = createSlice({
         const { columnId, id } = action.payload;
         state.data.columns[columnId].tasks[id] = action.payload;
         state.data.columns[columnId].taskOrders.push(id);
-      })
-      .addCase(createLabel.fulfilled, (state, action) => {
-        const { id } = action.payload;
-        state.data.labels[id] = action.payload;
       });
   },
 });
@@ -184,52 +176,10 @@ export const fullTaskMovement = createAsyncThunk(
   }
 );
 
-export const updateLabel = createAsyncThunk(
-  'boards/updateLabel',
-  async (label, { dispatch }) => {
-    console.log(label);
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        label,
-      }),
-    };
-
-    await fetch('http://localhost:3000/api/v1/labels', requestOptions).catch(
-      (error) => console.error(error)
-    );
-  }
-);
-
-export const createLabel = createAsyncThunk(
-  'boards/createLabel',
-  async (newLabel, { getState }) => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        label: {
-          name: newLabel.name,
-          board_id: getState().boards.data.id,
-          color: newLabel.color,
-        },
-      }),
-    };
-    const response = await fetch(
-      'http://localhost:3000/api/v1/labels',
-      requestOptions
-    );
-
-    return await response.json();
-  }
-);
-
 export const {
   optimisticColumnDrag,
   optimisticInnerTaskReorder,
   optimisticFullTaskReorder,
-  optimisticLabelUpdate,
   taskTitleUpdate,
   taskCoverColorUpdate,
 } = boardSlice.actions;

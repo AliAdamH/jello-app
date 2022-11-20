@@ -16,6 +16,7 @@ import {
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
+import { fetchLabelsOfBoard } from '../labels/labelsSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -66,6 +67,7 @@ function Board() {
   useEffect(() => {
     if (dataStatus === 'idle') {
       dispatch(fetchBoardData());
+      dispatch(fetchLabelsOfBoard());
     }
   }, [dataStatus, dispatch]);
 

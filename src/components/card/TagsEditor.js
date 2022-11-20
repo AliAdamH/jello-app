@@ -6,7 +6,7 @@ import {
   optimisticLabelUpdate,
   updateLabel,
   createLabel,
-} from '../board/boardSlice';
+} from '../labels/labelsSlice';
 
 const DEFAULT_COLORS = [
   '#e0ffff',
@@ -25,10 +25,6 @@ const DEFAULT_COLORS = [
   '#fdc57b',
   '#fdb44b',
   '#ff9a3c',
-  // '#ffd6c2',
-  // '#feceab',
-  // '#f8b195',
-  // '#fc3c3c',
 ];
 
 const TileContainer = styled.div`
@@ -120,7 +116,7 @@ const ActionButton = styled.button`
 
 function TagsEditor() {
   const dispatch = useDispatch();
-  const boardLabels = useSelector((state) => state.boards.data.labels);
+  const boardLabels = useSelector((state) => state.labels.items);
   const [editIsActive, setEditIsActive] = useState(false);
   const [labelToEdit, setLabelToEdit] = useState(null);
   const [selectedNewColor, setSelectedNewColor] = useState(null);

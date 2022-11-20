@@ -2,7 +2,11 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FaPen } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { optimisticLabelUpdate, updateLabel } from '../board/boardSlice';
+import {
+  optimisticLabelUpdate,
+  updateLabel,
+  createLabel,
+} from '../board/boardSlice';
 
 const DEFAULT_COLORS = [
   '#e0ffff',
@@ -78,6 +82,8 @@ const TileActivationButton = styled.button`
 
 const LabelTile = styled.div`
   flex: 1;
+  padding: 0.25rem;
+  text-align: center;
   border-radius: 0.25rem;
   background-color: ${(props) => props.bgColor};
 `;
@@ -118,18 +124,47 @@ function TagsEditor() {
   const [editIsActive, setEditIsActive] = useState(false);
   const [labelToEdit, setLabelToEdit] = useState(null);
   const [selectedNewColor, setSelectedNewColor] = useState(null);
+  const [actionType, setActionType] = useState(null);
   const labelTextRef = useRef(null);
+
+  const handleNewLabel = () => {
+    handleLabelEdition(
+      {
+        name: '',
+        color: '#dddddd',
+      },
+      'create'
+    );
+  };
+
+  const handleLabelCreation = () => {
+    if (
+      selectedNewColor !== null &&
+      labelTextRef.current.value.trim().length >= 0
+    ) {
+      // save the label
+      let labelToCreate = {
+        color: selectedNewColor,
+        name: labelTextRef.current.value,
+      };
+      dispatch(createLabel(labelToCreate));
+    }
+    handleLabelEditingEnd();
+  };
+
   const handleLabelToggle = (label) => {
     console.log(label);
   };
-  const handleLabelEdition = (label) => {
+  const handleLabelEdition = (label, actionType) => {
     setEditIsActive(true);
     setLabelToEdit(label);
+    setActionType(actionType);
   };
   const handleLabelEditingEnd = () => {
     setEditIsActive(false);
     setLabelToEdit(null);
     setSelectedNewColor(null);
+    setActionType(null);
   };
 
   const handleLabelEditingSave = () => {
@@ -160,15 +195,19 @@ function TagsEditor() {
                 <TileActivationButton onClick={() => handleLabelToggle(label)}>
                   +
                 </TileActivationButton>
-                <LabelTile bgColor={label.color} />
+                <LabelTile bgColor={label.color}>{label.name}</LabelTile>
 
-                <TileActivationButton onClick={() => handleLabelEdition(label)}>
+                <TileActivationButton
+                  onClick={() => handleLabelEdition(label, 'edit')}
+                >
                   <FaPen fontSize={'12px'} />
                 </TileActivationButton>
               </ActivableTile>
             );
           })}
-          <NewLabelButton>Create a label</NewLabelButton>
+          <NewLabelButton onClick={handleNewLabel}>
+            Create a label
+          </NewLabelButton>
         </>
       ) : (
         <>
@@ -194,7 +233,14 @@ function TagsEditor() {
           <ActionButton bgColor={'lightgray'} onClick={handleLabelEditingEnd}>
             Return
           </ActionButton>
-          <ActionButton bgColor={'lightblue'} onClick={handleLabelEditingSave}>
+          <ActionButton
+            bgColor={'lightblue'}
+            onClick={
+              actionType === 'edit'
+                ? handleLabelEditingSave
+                : handleLabelCreation
+            }
+          >
             Save
           </ActionButton>
         </>

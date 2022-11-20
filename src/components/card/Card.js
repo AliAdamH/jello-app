@@ -22,13 +22,14 @@ const StyledModal = styled(Modal)`
 const CardContainer = styled.div`
   border-radius: 0.375rem;
   border-bottom: 1px solid lightgray;
-  min-height: 40px;
+  min-height: 64px;
   height: fit-content;
   padding: 0.5rem;
   margin-bottom: 0.375rem;
   display: flex;
   align-items: flex-end;
-  background-color: ${(props) => (props.isDragging ? 'lightgreen' : 'white')};
+  background-color: ${(props) => props.bgColor};
+  color: ${(props) => props.fontColor};
 
   &:hover {
     cursor: pointer;
@@ -47,6 +48,8 @@ const Card = (props) => {
             {...provided.dragHandleProps}
             ref={provided.innerRef}
             isDragging={snapshot.isDragging}
+            bgColor={props.task.coverColor}
+            fontColor={props.task.coverTextColor}
           >
             {props.task.title}
           </CardContainer>

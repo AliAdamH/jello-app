@@ -32,6 +32,8 @@ const boardSlice = createSlice({
       const task = action.payload;
       state.data.columns[task.columnId].tasks[task.id].coverColor =
         task.coverColor;
+      state.data.columns[task.columnId].tasks[task.id].coverTextColor =
+        task.coverTextColor;
     },
   },
   extraReducers(builder) {

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { updateTask } from './taskSlice';
 import { handleCoverColorChange } from './taskSlice';
 import { taskCoverColorUpdate } from '../board/boardSlice';
+import invert from 'invert-color';
 
 const ColorInput = styled.input`
   appearance: none;
@@ -36,14 +37,15 @@ function CoverEditor({ closeEditor }) {
   const dispatch = useDispatch();
   const handleCoverColorUpdate = () => {
     const newCoverColor = coverColorRef.current.value;
-    console.log('the value is', newCoverColor);
     if (newCoverColor !== task.coverColor) {
-      dispatch(handleCoverColorChange(newCoverColor));
+      let newCoverTextColor = invert(newCoverColor, true);
+      dispatch(handleCoverColorChange({ newCoverColor, newCoverTextColor }));
       dispatch(updateTask());
       dispatch(
         taskCoverColorUpdate({
           ...task,
           coverColor: newCoverColor,
+          coverTextColor: newCoverTextColor,
         })
       );
     }
@@ -66,7 +68,6 @@ function CoverEditor({ closeEditor }) {
         type={'color'}
         defaultValue={task.coverColor}
       />
-      <div>{task.coverColor}</div>
       <ActionButton bgColor={'lightblue'} onClick={handleCoverColorUpdate}>
         Save
       </ActionButton>

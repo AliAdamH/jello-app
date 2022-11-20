@@ -20,7 +20,9 @@ const taskSlice = createSlice({
       state.task.description = action.payload;
     },
     handleCoverColorChange(state, action) {
-      state.task.coverColor = action.payload;
+      let { newCoverColor, newCoverTextColor } = action.payload;
+      state.task.coverColor = newCoverColor;
+      state.task.coverTextColor = newCoverTextColor;
     },
   },
   extraReducers(builder) {

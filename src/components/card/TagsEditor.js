@@ -6,7 +6,10 @@ import {
   optimisticLabelUpdate,
   updateLabel,
   createLabel,
+  assignLabel,
+  removeAssignedLabel,
 } from '../labels/labelsSlice';
+import { handleLabelAssignment, handleLabelRemoval } from './taskSlice';
 
 const DEFAULT_COLORS = [
   '#e0ffff',
@@ -116,6 +119,7 @@ const ActionButton = styled.button`
 
 function TagsEditor() {
   const dispatch = useDispatch();
+  const currentTaskLabels = useSelector((state) => state.tasks.task.labels);
   const boardLabels = useSelector((state) => state.labels.items);
   const [editIsActive, setEditIsActive] = useState(false);
   const [labelToEdit, setLabelToEdit] = useState(null);
@@ -148,8 +152,14 @@ function TagsEditor() {
     handleLabelEditingEnd();
   };
 
+  const handleTaskLabelRemove = (label) => {
+    dispatch(removeAssignedLabel(label));
+    dispatch(handleLabelRemoval(label));
+  };
+
   const handleLabelToggle = (label) => {
-    console.log(label);
+    dispatch(assignLabel(label));
+    dispatch(handleLabelAssignment(label));
   };
   const handleLabelEdition = (label, actionType) => {
     setEditIsActive(true);
@@ -189,9 +199,19 @@ function TagsEditor() {
           {Object.entries(boardLabels).map(([idx, label]) => {
             return (
               <ActivableTile key={idx}>
-                <TileActivationButton onClick={() => handleLabelToggle(label)}>
-                  +
-                </TileActivationButton>
+                {!currentTaskLabels[label.id] ? (
+                  <TileActivationButton
+                    onClick={() => handleLabelToggle(label)}
+                  >
+                    +
+                  </TileActivationButton>
+                ) : (
+                  <TileActivationButton
+                    onClick={() => handleTaskLabelRemove(label)}
+                  >
+                    -
+                  </TileActivationButton>
+                )}
                 <LabelTile bgColor={label.color}>{label.name}</LabelTile>
 
                 <TileActivationButton

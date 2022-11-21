@@ -42,7 +42,7 @@ export const fetchLabelsOfBoard = createAsyncThunk(
 );
 
 export const createLabel = createAsyncThunk(
-  'boards/createLabel',
+  'labels/createLabel',
   async (newLabel, { getState }) => {
     const requestOptions = {
       method: 'POST',
@@ -65,7 +65,7 @@ export const createLabel = createAsyncThunk(
 );
 
 export const updateLabel = createAsyncThunk(
-  'boards/updateLabel',
+  'labels/updateLabel',
   async (label, { dispatch }) => {
     console.log(label);
     const requestOptions = {
@@ -79,6 +79,45 @@ export const updateLabel = createAsyncThunk(
     await fetch('http://localhost:3000/api/v1/labels', requestOptions).catch(
       (error) => console.error(error)
     );
+  }
+);
+
+export const assignLabel = createAsyncThunk(
+  'labels',
+  async (label, { getState }) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        label_id: label.id,
+        task_id: getState().tasks.task.id,
+      }),
+    };
+    const response = await fetch(
+      'http://localhost:3000/api/v1/task_labels',
+      requestOptions
+    );
+
+    return await response.json();
+  }
+);
+
+export const removeAssignedLabel = createAsyncThunk(
+  'labels/removeAssignedLabel',
+  async (label, { getState }) => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        label_id: label.id,
+        task_id: getState().tasks.task.id,
+      }),
+    };
+
+    await fetch(
+      'http://localhost:3000/api/v1/task_labels',
+      requestOptions
+    ).catch((error) => console.error(error));
   }
 );
 

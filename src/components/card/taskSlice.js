@@ -24,6 +24,15 @@ const taskSlice = createSlice({
       state.task.coverColor = newCoverColor;
       state.task.coverTextColor = newCoverTextColor;
     },
+    handleLabelAssignment(state, action) {
+      let { id } = action.payload;
+      state.task.labels[id] = action.payload;
+    },
+    handleLabelRemoval(state, action) {
+      let { id } = action.payload;
+      const { [id]: _, ...rest } = state.task.labels;
+      state.task.labels = rest;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchTask.fulfilled, (state, action) => {
@@ -64,6 +73,8 @@ export const {
   resetTaskState,
   handleDescriptionChange,
   handleCoverColorChange,
+  handleLabelAssignment,
+  handleLabelRemoval,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

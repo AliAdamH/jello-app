@@ -14,6 +14,11 @@ const labelsSlice = createSlice({
       const updatedLabel = action.payload;
       state.items[updatedLabel.id] = updatedLabel;
     },
+    optimisticLabelDeletion(state, action) {
+      const { id } = action.payload;
+      const { [id]: _discard, ...rest } = state.items;
+      state.items = rest;
+    },
   },
   extraReducers(builder) {
     builder
@@ -27,7 +32,8 @@ const labelsSlice = createSlice({
   },
 });
 
-export const { optimisticLabelUpdate } = labelsSlice.actions;
+export const { optimisticLabelUpdate, optimisticLabelDeletion } =
+  labelsSlice.actions;
 
 export const fetchLabelsOfBoard = createAsyncThunk(
   'labels/fetchLabelsOfBoard',
@@ -118,6 +124,23 @@ export const removeAssignedLabel = createAsyncThunk(
       'http://localhost:3000/api/v1/task_labels',
       requestOptions
     ).catch((error) => console.error(error));
+  }
+);
+
+export const deleteLabel = createAsyncThunk(
+  'labels/deleteLabel',
+  async (label, _) => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        label,
+      }),
+    };
+
+    await fetch('http://localhost:3000/api/v1/labels', requestOptions).catch(
+      (error) => console.error(error)
+    );
   }
 );
 

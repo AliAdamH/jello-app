@@ -1,13 +1,15 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { FaPen } from 'react-icons/fa';
+import { FaPen, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   optimisticLabelUpdate,
+  optimisticLabelDeletion,
   updateLabel,
   createLabel,
   assignLabel,
   removeAssignedLabel,
+  deleteLabel,
 } from '../labels/labelsSlice';
 import { handleLabelAssignment, handleLabelRemoval } from './taskSlice';
 
@@ -152,6 +154,12 @@ function TagsEditor() {
     handleLabelEditingEnd();
   };
 
+  const handleLabelDeletion = (label) => {
+    dispatch(deleteLabel(label));
+    dispatch(optimisticLabelDeletion(label));
+    currentTaskLabels[label.id] && dispatch(handleLabelRemoval(label));
+  };
+
   const handleTaskLabelRemove = (label) => {
     dispatch(removeAssignedLabel(label));
     dispatch(handleLabelRemoval(label));
@@ -218,6 +226,11 @@ function TagsEditor() {
                   onClick={() => handleLabelEdition(label, 'edit')}
                 >
                   <FaPen fontSize={'12px'} />
+                </TileActivationButton>
+                <TileActivationButton
+                  onClick={() => handleLabelDeletion(label)}
+                >
+                  <FaTrash fontSize={'12px'} />
                 </TileActivationButton>
               </ActivableTile>
             );

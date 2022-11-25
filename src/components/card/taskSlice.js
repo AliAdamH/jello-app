@@ -33,6 +33,11 @@ const taskSlice = createSlice({
       const { [id]: _, ...rest } = state.task.labels;
       state.task.labels = rest;
     },
+    handleDueDate(state, action) {
+      let { dueDate, dueDateReminder } = action.payload;
+      state.task.dueDate = dueDate;
+      // state.task.dueDateReminder = dueDateReminder;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchTask.fulfilled, (state, action) => {
@@ -68,6 +73,7 @@ export const updateTask = createAsyncThunk(
     await fetch('http://localhost:3000/api/v1/tasks', requestOptions);
   }
 );
+
 export const {
   handleTitleChange,
   resetTaskState,
@@ -75,6 +81,7 @@ export const {
   handleCoverColorChange,
   handleLabelAssignment,
   handleLabelRemoval,
+  handleDueDate,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

@@ -1,6 +1,7 @@
 import React from 'react';
 import CoverEditor from './CoverEditor';
 import TagsEditor from './TagsEditor';
+import dueDateEditor from './DueDateEditor';
 import styled from 'styled-components';
 
 const EditorCloseButton = styled.button`
@@ -14,6 +15,7 @@ const EditorCloseButton = styled.button`
 const sideEditorComponents = {
   cover: CoverEditor,
   tags: TagsEditor,
+  dueDate: dueDateEditor,
 };
 
 const Container = styled.div`

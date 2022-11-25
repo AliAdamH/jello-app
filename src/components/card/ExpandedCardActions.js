@@ -47,7 +47,7 @@ function ExpandedCardActions({ openEditor }) {
         <FaTags />
         Tags
       </CardAction>
-      <CardAction>
+      <CardAction onClick={() => openEditor('dueDate')}>
         <FaClock />
         Dates
       </CardAction>

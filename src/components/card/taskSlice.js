@@ -34,9 +34,13 @@ const taskSlice = createSlice({
       state.task.labels = rest;
     },
     handleDueDate(state, action) {
-      let { dueDate, dueDateReminder } = action.payload;
+      let { dueDate, dueDateStatus } = action.payload;
       state.task.dueDate = dueDate;
+      state.task.dueDateStatus = dueDateStatus;
       // state.task.dueDateReminder = dueDateReminder;
+    },
+    handleDueDateExceeded(state, _) {
+      state.task.dueDateStatus = 'overdue';
     },
   },
   extraReducers(builder) {
@@ -82,6 +86,7 @@ export const {
   handleLabelAssignment,
   handleLabelRemoval,
   handleDueDate,
+  handleDueDateExceeded,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

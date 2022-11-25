@@ -12,6 +12,7 @@ import {
   updateTask,
   resetTaskState,
   handleDescriptionChange,
+  handleDueDateExceeded,
 } from './taskSlice';
 import SideEditor from './SideEditor';
 
@@ -116,6 +117,23 @@ function ExpandedCard({ title, description, close, taskId }) {
     dispatch(handleDescriptionChange(newDescriptionValue));
     dispatch(updateTask());
   };
+
+  // Is the card overdue ? Use the local date to send answer
+  // to server.
+  useEffect(() => {
+    if (status === 'successful') {
+      const clientCurrentDate = new Date().toLocaleDateString('en-CA');
+      if (
+        task.dueDate &&
+        task.dueDateStatus === 'idle' &&
+        clientCurrentDate.localeCompare(task.dueDate) > 0
+      ) {
+        dispatch(handleDueDateExceeded());
+        dispatch(updateTask());
+        console.log('FIRED !');
+      }
+    }
+  }, [status, task?.dueDate, task?.dueDateStatus, dispatch]);
 
   useEffect(() => {
     return () => dispatch(resetTaskState());

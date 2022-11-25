@@ -17,6 +17,7 @@ function DueDateEditor() {
       handleDueDate({
         dueDate: dateRef.current.value,
         dueDateReminder: dateReminderRef.current.value,
+        dueDateStatus: 'idle',
       })
     );
     dispatch(updateTask());

@@ -35,6 +35,14 @@ const boardSlice = createSlice({
       state.data.columns[task.columnId].tasks[task.id].coverTextColor =
         task.coverTextColor;
     },
+    columnDeletion(state, action) {
+      let id = action.payload;
+      let { [id]: _, ...rest } = state.data.columns;
+      state.data.columns = rest;
+      state.data.colOrderIds = state.data.colOrderIds.filter(
+        (colId) => colId !== +id
+      );
+    },
   },
   extraReducers(builder) {
     builder
@@ -176,12 +184,30 @@ export const fullTaskMovement = createAsyncThunk(
   }
 );
 
+export const deleteColumn = createAsyncThunk(
+  'boards/deleteColumn',
+  async (id, _) => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+      }),
+    };
+
+    await fetch('http://localhost:3000/api/v1/columns', requestOptions).catch(
+      (error) => console.error(error)
+    );
+  }
+);
+
 export const {
   optimisticColumnDrag,
   optimisticInnerTaskReorder,
   optimisticFullTaskReorder,
   taskTitleUpdate,
   taskCoverColorUpdate,
+  columnDeletion,
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

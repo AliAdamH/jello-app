@@ -5,7 +5,7 @@ import CardActivityFeed from './CardActivityFeed';
 import EditableDescription from './EditableDescription';
 import EditableTitle from './EditableTitle';
 import ExpandedCardActions from './ExpandedCardActions';
-import { taskTitleUpdate } from '../board/boardSlice';
+import { deleteTask, taskDeletion, taskTitleUpdate } from '../board/boardSlice';
 import {
   fetchTask,
   handleTitleChange,
@@ -144,6 +144,17 @@ function ExpandedCard({ title, description, close, taskId }) {
     setEditorContent(component);
   };
 
+  const handleDeleteTask = () => {
+    close();
+    dispatch(
+      taskDeletion({
+        taskId: task.id,
+        columnId: task.columnId,
+      })
+    );
+    dispatch(deleteTask(task.id));
+  };
+
   return (
     <>
       {status === 'successful' ? (
@@ -166,7 +177,10 @@ function ExpandedCard({ title, description, close, taskId }) {
               <CardActivityFeed />
             </Left>
             <Right>
-              <ExpandedCardActions openEditor={handleEditorOpening} />
+              <ExpandedCardActions
+                openEditor={handleEditorOpening}
+                deleteTask={handleDeleteTask}
+              />
             </Right>
           </Body>
           {sideEditorOpen ? (

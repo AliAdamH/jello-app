@@ -43,6 +43,14 @@ const boardSlice = createSlice({
         (colId) => colId !== +id
       );
     },
+    taskDeletion(state, action) {
+      let { taskId, columnId } = action.payload;
+      let { [taskId]: _, ...rest } = state.data.columns[columnId].tasks;
+      state.data.columns[columnId].tasks = rest;
+      state.data.columns[columnId].taskOrders = state.data.columns[
+        columnId
+      ].taskOrders.filter((id) => id !== +taskId);
+    },
   },
   extraReducers(builder) {
     builder
@@ -56,7 +64,7 @@ const boardSlice = createSlice({
       .addCase(newColumn.fulfilled, (state, action) => {
         const columnId = action.payload.id;
         state.data.columns[columnId] = action.payload;
-        state.data.colOrderIds.push(columnId);
+        state.data.colOrderIds.push(+columnId);
       })
       .addCase(createTask.fulfilled, (state, action) => {
         const { columnId, id } = action.payload;
@@ -201,6 +209,23 @@ export const deleteColumn = createAsyncThunk(
   }
 );
 
+export const deleteTask = createAsyncThunk(
+  'boards/deleteTask',
+  async (id, _) => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+      }),
+    };
+
+    await fetch('http://localhost:3000/api/v1/tasks', requestOptions).catch(
+      (error) => console.error(error)
+    );
+  }
+);
+
 export const {
   optimisticColumnDrag,
   optimisticInnerTaskReorder,
@@ -208,6 +233,7 @@ export const {
   taskTitleUpdate,
   taskCoverColorUpdate,
   columnDeletion,
+  taskDeletion,
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

@@ -8,6 +8,7 @@ import {
   FaPaperclip,
   FaExchangeAlt,
   FaRobot,
+  FaTrash,
 } from 'react-icons/fa';
 
 const CardAction = styled.button`
@@ -34,7 +35,7 @@ const CardActionContainer = styled.div`
   padding: 1rem;
 `;
 
-function ExpandedCardActions({ openEditor }) {
+function ExpandedCardActions({ openEditor, deleteTask }) {
   return (
     <CardActionContainer>
       <CardAction>
@@ -62,6 +63,15 @@ function ExpandedCardActions({ openEditor }) {
       <CardAction>
         <FaRobot />
         Automation
+      </CardAction>
+      <CardAction
+        onClick={() => deleteTask()}
+        style={{
+          backgroundColor: '#ff6464',
+        }}
+      >
+        <FaTrash />
+        Delete
       </CardAction>
     </CardActionContainer>
   );

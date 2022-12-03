@@ -27,13 +27,25 @@ const CardContainer = styled.div`
   padding: 0.5rem;
   margin-bottom: 0.375rem;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
   background-color: ${(props) => props.bgColor};
   color: ${(props) => props.fontColor};
+  cursor: pointer;
+`;
 
-  &:hover {
-    cursor: pointer;
-  }
+const LabelsContainer = styled.div`
+  display: flex;
+  gap: 0.2rem;
+`;
+
+const Label = styled.div`
+  width: 0.825rem;
+  height: 0.825rem;
+  border-radius: 50%;
+  border: 1px solid ${(props) => props.borderColor};
+  background-color: ${(props) => props.backgroundColor};
 `;
 const Card = (props) => {
   const [expanded, setExpanded] = useState(false);
@@ -51,6 +63,17 @@ const Card = (props) => {
             bgColor={props.task.coverColor}
             fontColor={props.task.coverTextColor}
           >
+            <LabelsContainer>
+              {Object.keys(props.task.labels).map((k, _) => {
+                return (
+                  <Label
+                    key={k}
+                    borderColor={props.task.coverTextColor}
+                    backgroundColor={props.task.labels[k].color}
+                  />
+                );
+              })}
+            </LabelsContainer>
             {props.task.title}
           </CardContainer>
         )}

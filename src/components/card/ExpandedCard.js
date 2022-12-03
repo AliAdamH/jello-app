@@ -15,6 +15,8 @@ import {
   handleDueDateExceeded,
 } from './taskSlice';
 import SideEditor from './SideEditor';
+import isEmpty from 'lodash.isempty';
+import LabelsList from '../labels/LabelsList';
 
 const Expanded = styled.div`
   border-radius: 0.375rem;
@@ -170,6 +172,9 @@ function ExpandedCard({ title, description, close, taskId }) {
                 columnTitle={'Test Column Title'}
                 handleTitleUpdate={handleTitleUpdate}
               />
+              {!isEmpty(task.labels) ? (
+                <LabelsList labels={task.labels} />
+              ) : null}
               <EditableDescription
                 description={task.description}
                 handleDescriptionUpdate={handleDescriptionUpdate}

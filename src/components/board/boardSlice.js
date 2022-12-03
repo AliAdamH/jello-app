@@ -51,6 +51,10 @@ const boardSlice = createSlice({
         columnId
       ].taskOrders.filter((id) => id !== +taskId);
     },
+    optimisticColumnTitleUpdate(state, action) {
+      let { columnId, title } = action.payload;
+      state.data.columns[columnId].title = title;
+    },
   },
   extraReducers(builder) {
     builder
@@ -140,6 +144,26 @@ export const updateColumnOrder = createAsyncThunk(
       'http://localhost:3000/api/v1/order_columns/' + boardId,
       requestOptions
     ).catch((error) => console.error(error));
+  }
+);
+
+export const updateColumnTitle = createAsyncThunk(
+  'boards/updateColumn',
+  async ({ columnId, title }, _) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        // remove duplicated boardId ?
+        column: {
+          id: columnId,
+          title,
+        },
+      }),
+    };
+    await fetch('http://localhost:3000/api/v1/columns', requestOptions).catch(
+      (error) => console.error(error)
+    );
   }
 );
 
@@ -234,6 +258,7 @@ export const {
   taskCoverColorUpdate,
   columnDeletion,
   taskDeletion,
+  optimisticColumnTitleUpdate,
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

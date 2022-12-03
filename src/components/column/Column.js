@@ -4,8 +4,14 @@ import Card from '../card/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
 import NewTask from '../card/NewTask';
 import { FaTrash } from 'react-icons/fa';
-import { columnDeletion, deleteColumn } from '../board/boardSlice';
+import {
+  columnDeletion,
+  deleteColumn,
+  optimisticColumnTitleUpdate,
+  updateColumnTitle,
+} from '../board/boardSlice';
 import { useDispatch } from 'react-redux';
+import EditableColumnTitle from './EditableColumnTitle';
 const Container = styled.div`
   border: 1px solid lightgray;
   border-radius: 0.375rem;
@@ -96,13 +102,27 @@ const Column = (props) => {
     dispatch(deleteColumn(props.column.id));
   };
 
+  const handleTitleUpdate = (newTitle) => {
+    let columnObject = {
+      columnId: props.column.id,
+      title: newTitle,
+    };
+
+    dispatch(optimisticColumnTitleUpdate(columnObject));
+    dispatch(updateColumnTitle(columnObject));
+  };
+
   return (
     <>
       <Draggable draggableId={props.column.id} index={props.index}>
         {(provided) => (
           <Container ref={provided.innerRef} {...provided.draggableProps}>
-            <TitleWrapper>
-              <Title {...provided.dragHandleProps}>{props.column.title}</Title>
+            <TitleWrapper {...provided.dragHandleProps}>
+              <EditableColumnTitle
+                title={props.column.title}
+                handleTitleUpdate={handleTitleUpdate}
+              />
+              {/* <Title {...provided.dragHandleProps}>{props.column.title}</Title> */}
               <DeleteButton onClick={handleColumnDeletion}>
                 <FaTrash fontSize={'12px'} />
               </DeleteButton>

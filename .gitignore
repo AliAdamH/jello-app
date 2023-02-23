@@ -25,3 +25,4 @@ yarn-error.log*
 example-result.js
 example-snapshot.js
 background-example.jpg
+.vscode

@@ -1,8 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import initialReducer from './initialReducer';
-import taskReducer from '../components/card/taskSlice';
-import boardReducer from '../components/board/boardSlice';
-import labelReducer from '../components/labels/labelsSlice';
+import taskReducer from '../pages/board/task/taskSlice';
+import boardReducer from '../pages/board/boardSlice';
+import labelReducer from '../pages/board/labels/labelsSlice';
 export default configureStore({
   reducer: {
     tasks: taskReducer,

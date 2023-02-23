@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
-import Column from '../column/Column';
-import NewColumn from '../column/NewColumn';
+import Column from './column/Column';
+import NewColumn from './column/NewColumn';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   createTask,
@@ -16,7 +16,7 @@ import {
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
-import { fetchLabelsOfBoard } from '../labels/labelsSlice';
+import { fetchLabelsOfBoard } from './labels/labelsSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { updateTask } from './taskSlice';
 import { handleCoverColorChange } from './taskSlice';
-import { taskCoverColorUpdate } from '../board/boardSlice';
+import { taskCoverColorUpdate } from '../boardSlice';
 import invert from 'invert-color';
 
 const ColorInput = styled.input`

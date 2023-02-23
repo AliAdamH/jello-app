@@ -1,13 +1,8 @@
-import { useState } from 'react';
 import './App.css';
-import initialData from './initial-data';
-import { ExampleResult } from './example-result';
 import { Routes, Route } from 'react-router-dom';
-import Home from './components/home/Home';
-import Board from './components/board/Board';
-import Navbar from './components/navbar/Navbar';
-
-import styled from 'styled-components';
+import Home from './pages/dashboard/Home';
+import Board from './pages/board/Board';
+import Navbar from './layout/Navbar';
 
 function App() {
   return (

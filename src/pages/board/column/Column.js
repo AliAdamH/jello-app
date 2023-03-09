@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Card from '../task/Card';
+import Card from 'pages/board/task/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
-import NewTask from '../task/NewTask';
+import NewTask from 'pages/board/task/NewTask';
 import { FaTrash } from 'react-icons/fa';
 import {
   columnDeletion,
   deleteColumn,
   optimisticColumnTitleUpdate,
   updateColumnTitle,
-} from '../boardSlice';
+} from 'pages/board/boardSlice';
 import { useDispatch } from 'react-redux';
 import EditableColumnTitle from './EditableColumnTitle';
 const Container = styled.div`

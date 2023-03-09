@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import BoardList from './BoardList';
+import BoardList from 'pages/dashboard/BoardList';
 
 const HomeContainer = styled.div`
   margin-top: 64px;

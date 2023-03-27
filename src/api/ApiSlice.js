@@ -7,7 +7,14 @@ export const apiSlice = createApi({
     getBoardData: builder.query({
       query: () => '/boards',
     }),
+    getBoardLabels: builder.query({
+      query: (boardId) => `/labels?board=${boardId}`,
+    }),
+    getTask: builder.query({
+      query: (taskId) => `/tasks/${taskId}`,
+    }),
   }),
 });
 
-export const { useGetBoardDataQuery } = apiSlice;
+export const { useGetBoardDataQuery, useGetBoardLabelsQuery, useGetTaskQuery } =
+  apiSlice;

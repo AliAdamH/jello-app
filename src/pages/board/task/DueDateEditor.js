@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleDueDate, updateTask } from './taskSlice';
-
-function DueDateEditor() {
-  const currentDueDate = useSelector((state) => state.tasks.task.dueDate);
+import { useGetTaskQuery } from 'api/ApiSlice';
+function DueDateEditor({ taskId }) {
+  const currentDueDate = useGetTaskQuery(taskId).data.dueDate;
   const dispatch = useDispatch();
   const dateRef = useRef(null);
   const dateReminderRef = useRef(null);

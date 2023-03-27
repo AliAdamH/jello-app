@@ -12,7 +12,8 @@ import {
   deleteLabel,
 } from '../labels/labelsSlice';
 import { handleLabelAssignment, handleLabelRemoval } from './taskSlice';
-
+import { useGetBoardLabelsQuery } from 'api/ApiSlice';
+import { useGetTaskQuery } from 'api/ApiSlice';
 const DEFAULT_COLORS = [
   '#e0ffff',
   '#add8e6',
@@ -119,10 +120,11 @@ const ActionButton = styled.button`
   }
 `;
 
-function TagsEditor() {
+function TagsEditor({ closeEditor, taskId }) {
   const dispatch = useDispatch();
-  const currentTaskLabels = useSelector((state) => state.tasks.task.labels);
-  const boardLabels = useSelector((state) => state.labels.items);
+  const currentTaskLabels = useGetTaskQuery(taskId).data.labels;
+  // const boardLabels = useSelector((state) => state.labels.items);
+  const { data: boardLabels, isLoading } = useGetBoardLabelsQuery(1);
   const [editIsActive, setEditIsActive] = useState(false);
   const [labelToEdit, setLabelToEdit] = useState(null);
   const [selectedNewColor, setSelectedNewColor] = useState(null);
@@ -204,37 +206,39 @@ function TagsEditor() {
       {!editIsActive ? (
         <>
           <div>Labels</div>
-          {Object.entries(boardLabels).map(([idx, label]) => {
-            return (
-              <ActivableTile key={idx}>
-                {!currentTaskLabels[label.id] ? (
-                  <TileActivationButton
-                    onClick={() => handleLabelToggle(label)}
-                  >
-                    +
-                  </TileActivationButton>
-                ) : (
-                  <TileActivationButton
-                    onClick={() => handleTaskLabelRemove(label)}
-                  >
-                    -
-                  </TileActivationButton>
-                )}
-                <LabelTile bgColor={label.color}>{label.name}</LabelTile>
 
-                <TileActivationButton
-                  onClick={() => handleLabelEdition(label, 'edit')}
-                >
-                  <FaPen fontSize={'12px'} />
-                </TileActivationButton>
-                <TileActivationButton
-                  onClick={() => handleLabelDeletion(label)}
-                >
-                  <FaTrash fontSize={'12px'} />
-                </TileActivationButton>
-              </ActivableTile>
-            );
-          })}
+          {!isLoading &&
+            Object.entries(boardLabels.labels).map(([idx, label]) => {
+              return (
+                <ActivableTile key={idx}>
+                  {!currentTaskLabels[label.id] ? (
+                    <TileActivationButton
+                      onClick={() => handleLabelToggle(label)}
+                    >
+                      +
+                    </TileActivationButton>
+                  ) : (
+                    <TileActivationButton
+                      onClick={() => handleTaskLabelRemove(label)}
+                    >
+                      -
+                    </TileActivationButton>
+                  )}
+                  <LabelTile bgColor={label.color}>{label.name}</LabelTile>
+
+                  <TileActivationButton
+                    onClick={() => handleLabelEdition(label, 'edit')}
+                  >
+                    <FaPen fontSize={'12px'} />
+                  </TileActivationButton>
+                  <TileActivationButton
+                    onClick={() => handleLabelDeletion(label)}
+                  >
+                    <FaTrash fontSize={'12px'} />
+                  </TileActivationButton>
+                </ActivableTile>
+              );
+            })}
           <NewLabelButton onClick={handleNewLabel}>
             Create a label
           </NewLabelButton>

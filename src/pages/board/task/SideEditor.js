@@ -24,11 +24,11 @@ const Container = styled.div`
   gap: 0.75rem;
 `;
 
-function SideEditor({ editorToRender, closeEditor, task }) {
+function SideEditor({ editorToRender, closeEditor, taskId }) {
   const ToRender = sideEditorComponents[editorToRender];
   return (
     <Container>
-      <ToRender closeEditor={closeEditor} />
+      <ToRender closeEditor={closeEditor} taskId={taskId} />
       <EditorCloseButton onClick={closeEditor}>Close</EditorCloseButton>
     </Container>
   );

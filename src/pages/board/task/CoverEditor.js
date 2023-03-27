@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { updateTask } from './taskSlice';
 import { handleCoverColorChange } from './taskSlice';
 import { taskCoverColorUpdate } from '../boardSlice';
+import { useGetTaskQuery } from 'api/ApiSlice';
 import invert from 'invert-color';
 
 const ColorInput = styled.input`
@@ -30,8 +31,8 @@ const ActionButton = styled.button`
     opacity: 0.7;
   }
 `;
-function CoverEditor({ closeEditor }) {
-  const task = useSelector((state) => state.tasks.task);
+function CoverEditor({ closeEditor, taskId }) {
+  const { data: task } = useGetTaskQuery(taskId);
   const coverColorRef = useRef(null);
 
   const dispatch = useDispatch();

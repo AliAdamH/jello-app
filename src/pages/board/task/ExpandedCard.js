@@ -17,7 +17,7 @@ import {
 import SideEditor from './SideEditor';
 import isEmpty from 'lodash.isempty';
 import LabelsList from '../labels/LabelsList';
-
+import { useGetTaskQuery } from 'api/ApiSlice';
 const Expanded = styled.div`
   border-radius: 0.375rem;
   background-color: #eee;
@@ -97,12 +97,12 @@ const SideEditorContainer = styled.div`
 function ExpandedCard({ title, description, close, taskId }) {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.tasks.status);
-  const task = useSelector((state) => state.tasks.task);
+  const { data: task, isSuccess } = useGetTaskQuery(taskId);
   const [sideEditorOpen, setSideEditorOpen] = useState(false);
   const [editorContent, setEditorContent] = useState('cover');
-  useEffect(() => {
-    dispatch(fetchTask(taskId));
-  }, [dispatch, taskId]);
+  // useEffect(() => {
+  //   dispatch(fetchTask(taskId));
+  // }, [dispatch, taskId]);
 
   const handleTitleUpdate = (newTitleValue) => {
     dispatch(handleTitleChange(newTitleValue));
@@ -123,7 +123,7 @@ function ExpandedCard({ title, description, close, taskId }) {
   // Is the card overdue ? Use the local date to send answer
   // to server.
   useEffect(() => {
-    if (status === 'successful') {
+    if (isSuccess) {
       const clientCurrentDate = new Date().toLocaleDateString('en-CA');
       if (
         task.dueDate &&
@@ -135,7 +135,7 @@ function ExpandedCard({ title, description, close, taskId }) {
         console.log('FIRED !');
       }
     }
-  }, [status, task?.dueDate, task?.dueDateStatus, dispatch]);
+  }, [isSuccess, task?.dueDate, task?.dueDateStatus, dispatch]);
 
   useEffect(() => {
     return () => dispatch(resetTaskState());
@@ -159,7 +159,7 @@ function ExpandedCard({ title, description, close, taskId }) {
 
   return (
     <>
-      {status === 'successful' ? (
+      {isSuccess ? (
         <Expanded>
           <Cover>
             <ModalCloseButton onClick={() => close()}>x</ModalCloseButton>
@@ -191,6 +191,7 @@ function ExpandedCard({ title, description, close, taskId }) {
           {sideEditorOpen ? (
             <SideEditorContainer>
               <SideEditor
+                taskId={taskId}
                 editorToRender={editorContent}
                 closeEditor={() => setSideEditorOpen(false)}
               />

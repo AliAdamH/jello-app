@@ -17,6 +17,7 @@ import {
   updateColumnOrder,
 } from './boardSlice';
 import { fetchLabelsOfBoard } from './labels/labelsSlice';
+import { useGetBoardDataQuery } from 'api/ApiSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -59,23 +60,24 @@ const ColumnsWrapper = React.memo((props) => {
 });
 
 function Board() {
-  const data = useSelector((state) => state.boards.data);
-  const dataStatus = useSelector((state) => state.boards.status);
-  const [loading, setLoading] = useState(true);
+  // const data = useSelector((state) => state.boards.data);
+  // const dataStatus = useSelector((state) => state.boards.status);
+  // const [loading, setLoading] = useState(true);
+  const { isLoading: loading, data } = useGetBoardDataQuery();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (dataStatus === 'idle') {
-      dispatch(fetchBoardData());
-      dispatch(fetchLabelsOfBoard());
-    }
-  }, [dataStatus, dispatch]);
+  // useEffect(() => {
+  //   if (dataStatus === 'idle') {
+  //     dispatch(fetchBoardData());
+  //     dispatch(fetchLabelsOfBoard());
+  //   }
+  // }, [dataStatus, dispatch]);
 
-  useEffect(() => {
-    if (dataStatus === 'success') {
-      setLoading(false);
-    }
-  }, [dataStatus]);
+  // useEffect(() => {
+  //   if (dataStatus === 'success') {
+  //     setLoading(false);
+  //   }
+  // }, [dataStatus]);
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;

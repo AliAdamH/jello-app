@@ -73,6 +73,75 @@ export const apiSlice = createApi({
         );
       },
     }),
+    deleteColumn: builder.mutation({
+      query: ({ columnId }) => ({
+        url: '/columns',
+        method: 'DELETE',
+        body: { id: columnId },
+      }),
+      async onQueryStarted({ columnId }, { dispatch, queryFulfilled }) {
+        /*
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData(
+            'getBoardData',
+            undefined,
+            (boardData) => {
+              const newTasks = Object.entries(boardData.tasks).filter(
+                ([id, task]) => {
+                  return Number(task.columnId) !== columnId;
+                }
+              );
+
+              const newColumns = Object.entries(boardData.columns).filter(
+                ([id, column]) => {
+                  console.log(id)
+                  return Number(id) !== columnId;
+                }
+              );
+              // const { [columnId]: _discard, ...restOfColumns } =
+              //   boardData.columns;
+              // console.log(restOfColumns);
+              Object.assign(boardData, {
+                ...boardData,
+                columns: Object.fromEntries(newColumns),
+                colOrderIds: boardData.colOrderIds.filter(
+                  (id) => id !== columnId
+                ),
+                tasks: Object.fromEntries(newTasks),
+              });
+              console.log(Object.entries(boardData.columns));
+            }
+          )
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+        */
+        await queryFulfilled;
+        dispatch(
+          apiSlice.util.updateQueryData(
+            'getBoardData',
+            undefined,
+            (boardData) => {
+              const newTasks = Object.entries(boardData.tasks).filter(
+                ([id, task]) => {
+                  return Number(task.columnId) !== Number(columnId);
+                }
+              );
+              const { [columnId]: _discard, ...restOfColumns } =
+                boardData.columns;
+              boardData.columns = restOfColumns;
+              boardData.colOrderIds = boardData.colOrderIds.filter(
+                (id) => id !== Number(columnId)
+              );
+              boardData.tasks = Object.fromEntries(newTasks);
+            }
+          )
+        );
+      },
+    }),
   }),
 });
 
@@ -82,4 +151,5 @@ export const {
   useGetTaskQuery,
   useCreateTaskMutation,
   useCreateColumnMutation,
+  useDeleteColumnMutation,
 } = apiSlice;

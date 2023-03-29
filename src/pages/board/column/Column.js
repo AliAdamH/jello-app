@@ -13,7 +13,11 @@ import {
 import { useDispatch } from 'react-redux';
 import EditableColumnTitle from './EditableColumnTitle';
 import { createSelector } from '@reduxjs/toolkit';
-import { useGetBoardDataQuery, useCreateTaskMutation } from 'api/ApiSlice';
+import {
+  useGetBoardDataQuery,
+  useCreateTaskMutation,
+  useDeleteColumnMutation,
+} from 'api/ApiSlice';
 
 const Container = styled.div`
   border: 1px solid lightgray;
@@ -85,7 +89,9 @@ const InnerList = React.memo(({ tasks }) => {
 
 const Column = ({ id, index, title }) => {
   const dispatch = useDispatch();
-  const [createTaskMutation, result] = useCreateTaskMutation();
+  const [createTaskMutation, taskMutationResult] = useCreateTaskMutation();
+  const [deleteColumnMutation, columnMutationResult] =
+    useDeleteColumnMutation();
   const selectTasksForColumn = useMemo(() => {
     const fallbackArray = [];
 
@@ -118,8 +124,7 @@ const Column = ({ id, index, title }) => {
   };
 
   const handleColumnDeletion = () => {
-    dispatch(columnDeletion(id));
-    dispatch(deleteColumn(id));
+    deleteColumnMutation({ columnId: id });
   };
 
   const handleTitleUpdate = (newTitle) => {

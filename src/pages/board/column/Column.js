@@ -13,7 +13,8 @@ import {
 import { useDispatch } from 'react-redux';
 import EditableColumnTitle from './EditableColumnTitle';
 import { createSelector } from '@reduxjs/toolkit';
-import { useGetBoardDataQuery } from 'api/ApiSlice';
+import { useGetBoardDataQuery, useCreateTaskMutation } from 'api/ApiSlice';
+
 const Container = styled.div`
   border: 1px solid lightgray;
   border-radius: 0.375rem;
@@ -22,11 +23,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const Title = styled.h3`
-  padding: 0.75rem;
-  flex: 1;
-  background-color: #eee;
-`;
+
 const TaskList = styled.div`
   min-height: 1rem;
   flex: 1;
@@ -80,20 +77,15 @@ const MiscButton = styled.button`
   }
 `;
 
-const NewInnerList = React.memo(({ tasks }) => {
+const InnerList = React.memo(({ tasks }) => {
   return tasks.map(([id, taskData], index) => {
     return <Card key={id} {...taskData} index={index} />;
   });
 });
 
-const InnerList = React.memo((props) => {
-  return props.tasks.map((task, index) => (
-    <Card key={task.id} task={task} index={index} />
-  ));
-});
-
-const Column = ({ id, index, title, createTask }) => {
+const Column = ({ id, index, title }) => {
   const dispatch = useDispatch();
+  const [createTaskMutation, result] = useCreateTaskMutation();
   const selectTasksForColumn = useMemo(() => {
     const fallbackArray = [];
 
@@ -119,7 +111,9 @@ const Column = ({ id, index, title, createTask }) => {
   };
 
   const addTask = (titleValue) => {
-    createTask(id, titleValue);
+    createTaskMutation({
+      task: { column_id: id, title: titleValue },
+    });
     setIsHavingNewTask(false);
   };
 
@@ -160,7 +154,7 @@ const Column = ({ id, index, title, createTask }) => {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <NewInnerList tasks={tasksForColumn} />
+                  <InnerList tasks={tasksForColumn} />
                   {provided.placeholder}
                 </TaskList>
               )}

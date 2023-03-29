@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from './column/Column';
 import NewColumn from './column/NewColumn';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
-  createTask,
-  fetchBoardData,
   fullTaskMovement,
   newColumn,
   optimisticColumnDrag,
@@ -16,7 +14,6 @@ import {
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
-import { fetchLabelsOfBoard } from './labels/labelsSlice';
 import { useGetBoardDataQuery } from 'api/ApiSlice';
 
 const BoardContainer = styled.div`
@@ -47,16 +44,8 @@ const filterTasks = (tasks, taskToRemoveId) => {
 };
 
 const ColumnsWrapper = React.memo((props) => {
-  const { column, index, handleCreateTask } = props;
-  // const tasks = column.taskOrders.map((taskId) => taskMap[taskId]);
-  return (
-    <Column
-      {...column}
-      // tasks={tasks}
-      index={index}
-      createTask={handleCreateTask}
-    />
-  );
+  const { column, index } = props;
+  return <Column {...column} index={index} />;
 });
 
 function Board() {
@@ -185,15 +174,6 @@ function Board() {
     );
   };
 
-  const handleCreateTask = async (columnId, value) => {
-    dispatch(
-      createTask({
-        columnId,
-        title: value,
-      })
-    );
-  };
-
   const handleNewColumn = async (columnTitle) => {
     dispatch(
       newColumn({
@@ -221,10 +201,6 @@ function Board() {
                     <ColumnsWrapper
                       key={column.id}
                       column={column}
-                      // // Here we will remove the taskMap and each col
-                      // // will have to get it's own tasks with a memoized selector.
-                      // taskMap={column.tasks}
-                      handleCreateTask={handleCreateTask}
                       index={idx}
                     />
                   );

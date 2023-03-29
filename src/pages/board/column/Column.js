@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Card from 'pages/board/task/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
@@ -12,6 +12,8 @@ import {
 } from 'pages/board/boardSlice';
 import { useDispatch } from 'react-redux';
 import EditableColumnTitle from './EditableColumnTitle';
+import { createSelector } from '@reduxjs/toolkit';
+import { useGetBoardDataQuery } from 'api/ApiSlice';
 const Container = styled.div`
   border: 1px solid lightgray;
   border-radius: 0.375rem;
@@ -78,14 +80,38 @@ const MiscButton = styled.button`
   }
 `;
 
+const NewInnerList = React.memo(({ tasks }) => {
+  return tasks.map(([id, taskData], index) => {
+    return <Card key={id} {...taskData} index={index} />;
+  });
+});
+
 const InnerList = React.memo((props) => {
   return props.tasks.map((task, index) => (
     <Card key={task.id} task={task} index={index} />
   ));
 });
 
-const Column = (props) => {
+const Column = ({ id, index, title, createTask }) => {
   const dispatch = useDispatch();
+  const selectTasksForColumn = useMemo(() => {
+    const fallbackArray = [];
+
+    return createSelector(
+      (res) => res.data,
+      (res, columnId) => columnId,
+      (data, columnId) =>
+        Object.entries(data?.tasks).filter(([_, hash]) => {
+          return hash.columnId === columnId;
+        }) ?? fallbackArray
+    );
+  }, []);
+  const { tasksForColumn } = useGetBoardDataQuery(undefined, {
+    selectFromResult: (result) => ({
+      ...result,
+      tasksForColumn: selectTasksForColumn(result, id),
+    }),
+  });
   const [isHavingNewTask, setIsHavingNewTask] = useState(false);
 
   const removeNewTask = () => {
@@ -93,18 +119,18 @@ const Column = (props) => {
   };
 
   const addTask = (titleValue) => {
-    props.createTask(props.column.id, titleValue);
+    createTask(id, titleValue);
     setIsHavingNewTask(false);
   };
 
   const handleColumnDeletion = () => {
-    dispatch(columnDeletion(props.column.id));
-    dispatch(deleteColumn(props.column.id));
+    dispatch(columnDeletion(id));
+    dispatch(deleteColumn(id));
   };
 
   const handleTitleUpdate = (newTitle) => {
     let columnObject = {
-      columnId: props.column.id,
+      columnId: id,
       title: newTitle,
     };
 
@@ -114,27 +140,27 @@ const Column = (props) => {
 
   return (
     <>
-      <Draggable draggableId={props.column.id} index={props.index}>
+      <Draggable draggableId={id} index={index}>
         {(provided) => (
           <Container ref={provided.innerRef} {...provided.draggableProps}>
             <TitleWrapper {...provided.dragHandleProps}>
               <EditableColumnTitle
-                title={props.column.title}
+                title={title}
                 handleTitleUpdate={handleTitleUpdate}
               />
-              {/* <Title {...provided.dragHandleProps}>{props.column.title}</Title> */}
+              {/* <Title {...provided.dragHandleProps}>{title}</Title> */}
               <DeleteButton onClick={handleColumnDeletion}>
                 <FaTrash fontSize={'12px'} />
               </DeleteButton>
             </TitleWrapper>
-            <Droppable type="task" droppableId={props.column.id}>
+            <Droppable type="task" droppableId={id}>
               {(provided, snapshot) => (
                 <TaskList
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList tasks={props.tasks} />
+                  <NewInnerList tasks={tasksForColumn} />
                   {provided.placeholder}
                 </TaskList>
               )}

@@ -47,12 +47,12 @@ const filterTasks = (tasks, taskToRemoveId) => {
 };
 
 const ColumnsWrapper = React.memo((props) => {
-  const { column, taskMap, index, handleCreateTask } = props;
-  const tasks = column.taskOrders.map((taskId) => taskMap[taskId]);
+  const { column, index, handleCreateTask } = props;
+  // const tasks = column.taskOrders.map((taskId) => taskMap[taskId]);
   return (
     <Column
-      column={column}
-      tasks={tasks}
+      {...column}
+      // tasks={tasks}
       index={index}
       createTask={handleCreateTask}
     />
@@ -221,7 +221,9 @@ function Board() {
                     <ColumnsWrapper
                       key={column.id}
                       column={column}
-                      taskMap={column.tasks}
+                      // // Here we will remove the taskMap and each col
+                      // // will have to get it's own tasks with a memoized selector.
+                      // taskMap={column.tasks}
                       handleCreateTask={handleCreateTask}
                       index={idx}
                     />

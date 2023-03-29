@@ -13,6 +13,16 @@ export const apiSlice = createApi({
     getTask: builder.query({
       query: (taskId) => `/tasks/${taskId}`,
     }),
+    createTask: builder.mutation({
+      query: (data) => ({
+        url: '/tasks',
+        method: 'PUT',
+        body: data,
+      }),
+      async onQueryStarted(data, { dispatch, queryFulfilled }) {
+        const patchResult = () => void 0;
+      },
+    }),
   }),
 });
 

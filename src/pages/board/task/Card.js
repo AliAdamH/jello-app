@@ -47,12 +47,13 @@ const Label = styled.div`
   border: 1px solid ${(props) => props.borderColor};
   background-color: ${(props) => props.backgroundColor};
 `;
-const Card = (props) => {
+// { id, index, labels, title, coverColor, coverTextColor }
+const Card = ({ id, index, labels, title, coverColor, coverTextColor }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <>
-      <Draggable draggableId={props.task.id} index={props.index}>
+      <Draggable draggableId={id} index={index}>
         {(provided, snapshot) => (
           <CardContainer
             onClick={() => setExpanded(true)}
@@ -60,21 +61,21 @@ const Card = (props) => {
             {...provided.dragHandleProps}
             ref={provided.innerRef}
             isDragging={snapshot.isDragging}
-            bgColor={props.task.coverColor}
-            fontColor={props.task.coverTextColor}
+            bgColor={coverColor}
+            fontColor={coverTextColor}
           >
             <LabelsContainer>
-              {Object.keys(props.task.labels).map((k, _) => {
+              {Object.keys(labels).map((k, _) => {
                 return (
                   <Label
                     key={k}
-                    borderColor={props.task.coverTextColor}
-                    backgroundColor={props.task.labels[k].color}
+                    borderColor={coverTextColor}
+                    backgroundColor={labels[k].color}
                   />
                 );
               })}
             </LabelsContainer>
-            {props.task.title}
+            {title}
           </CardContainer>
         )}
       </Draggable>
@@ -83,7 +84,7 @@ const Card = (props) => {
         shouldCloseOnOverlayClick={true}
         onRequestClose={() => setExpanded(false)}
       >
-        <ExpandedCard taskId={props.task.id} close={() => setExpanded(false)} />
+        <ExpandedCard taskId={id} close={() => setExpanded(false)} />
       </StyledModal>
     </>
   );

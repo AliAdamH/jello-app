@@ -22,9 +22,7 @@ export const apiSlice = createApi({
         body: taskData,
       }),
       async onQueryStarted(taskData, { dispatch, queryFulfilled }) {
-        console.log('hey');
         const { data: newTask } = await queryFulfilled;
-        console.log('Yea ?');
         dispatch(
           apiSlice.util.updateQueryData('getBoardData', undefined, (draft) => {
             return Object.assign(draft, {
@@ -46,7 +44,33 @@ export const apiSlice = createApi({
             });
           })
         );
-        console.log('No ?');
+      },
+    }),
+    createColumn: builder.mutation({
+      query: (columnData) => ({
+        url: '/columns',
+        method: 'POST',
+        body: columnData,
+      }),
+      async onQueryStarted(columnData, { dispatch, queryFulfilled }) {
+        const { data: newColumn } = await queryFulfilled;
+
+        dispatch(
+          apiSlice.util.updateQueryData(
+            'getBoardData',
+            undefined,
+            (boardData) => {
+              Object.assign(boardData, {
+                ...boardData,
+                colOrderIds: [...boardData.colOrderIds, Number(newColumn.id)],
+                columns: {
+                  ...boardData.columns,
+                  [newColumn.id]: { ...newColumn },
+                },
+              });
+            }
+          )
+        );
       },
     }),
   }),
@@ -57,4 +81,5 @@ export const {
   useGetBoardLabelsQuery,
   useGetTaskQuery,
   useCreateTaskMutation,
+  useCreateColumnMutation,
 } = apiSlice;

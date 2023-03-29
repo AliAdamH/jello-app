@@ -14,7 +14,7 @@ import {
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
-import { useGetBoardDataQuery } from 'api/ApiSlice';
+import { useGetBoardDataQuery, useCreateColumnMutation } from 'api/ApiSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -53,6 +53,7 @@ function Board() {
   // const dataStatus = useSelector((state) => state.boards.status);
   // const [loading, setLoading] = useState(true);
   const { isLoading: loading, data } = useGetBoardDataQuery();
+  const [createColumnMutation, result] = useCreateColumnMutation();
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -174,13 +175,10 @@ function Board() {
     );
   };
 
-  const handleNewColumn = async (columnTitle) => {
-    dispatch(
-      newColumn({
-        columnTitle,
-        boardId: data.id,
-      })
-    );
+  const handleNewColumn = (columnTitle) => {
+    createColumnMutation({
+      column: { title: columnTitle, board_id: data.id },
+    });
   };
 
   return (
@@ -196,7 +194,6 @@ function Board() {
               >
                 {data.colOrderIds.map((col, idx) => {
                   const column = data.columns[col];
-
                   return (
                     <ColumnsWrapper
                       key={column.id}

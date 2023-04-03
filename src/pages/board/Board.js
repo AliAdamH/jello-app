@@ -18,6 +18,7 @@ import {
   useGetBoardDataQuery,
   useCreateColumnMutation,
   useUpdateColumnOrderMutation,
+  useUpdateTaskVerticalOrderMutation,
 } from 'api/ApiSlice';
 
 const BoardContainer = styled.div`
@@ -59,6 +60,7 @@ function Board() {
   const { isLoading: loading, data } = useGetBoardDataQuery();
   const [createColumnMutation, result] = useCreateColumnMutation();
   const [updateColumnOrderMutation] = useUpdateColumnOrderMutation();
+  const [taskVerticalReorderMutation] = useUpdateTaskVerticalOrderMutation();
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -117,21 +119,25 @@ function Board() {
     if (start === finish) {
       const newTaskIds = Array.from(start.taskOrders);
       newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
-
-      dispatch(
-        optimisticInnerTaskReorder({
-          columnId: start.id,
-          newTaskOrders: newTaskIds,
-        })
-      );
-
-      dispatch(
-        taskInnerReorder({
-          columnId: start.id,
-          taskOrderIds: newTaskIds,
-        })
-      );
+      newTaskIds.splice(destination.index, 0, Number(draggableId));
+      //
+      // dispatch(
+      // optimisticInnerTaskReorder({
+      // columnId: start.id,
+      // newTaskOrders: newTaskIds,
+      // })
+      // );
+      //
+      // dispatch(
+      // taskInnerReorder({
+      // columnId: start.id,
+      // taskOrderIds: newTaskIds,
+      // })
+      // );
+      taskVerticalReorderMutation({
+        columnId: start.id,
+        newTaskIds,
+      });
       return;
     }
 

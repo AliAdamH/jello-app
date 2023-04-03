@@ -213,6 +213,33 @@ export const apiSlice = createApi({
         }
       },
     }),
+    updateTaskVerticalOrder: builder.mutation({
+      query: ({ columnId, newTaskIds }) => ({
+        url: '/order_tasks',
+        method: 'PUT',
+        body: {
+          column: {
+            id: columnId,
+            task_orders: newTaskIds,
+          },
+        },
+      }),
+      async onQueryStarted(
+        { columnId, newTaskIds },
+        { dispatch, queryFulfilled }
+      ) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
+            result.columns[columnId].taskOrders = newTaskIds;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
@@ -226,4 +253,5 @@ export const {
   useDeleteTaskMutation,
   useUpdateColumnMutation,
   useUpdateColumnOrderMutation,
+  useUpdateTaskVerticalOrderMutation,
 } = apiSlice;

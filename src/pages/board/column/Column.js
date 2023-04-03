@@ -82,13 +82,15 @@ const MiscButton = styled.button`
   }
 `;
 
-const InnerList = React.memo(({ tasks }) => {
-  return tasks.map(([id, taskData], index) => {
+const InnerList = React.memo(({ tasks, taskOrders }) => {
+  const convertedTasks = Object.fromEntries(tasks);
+  return taskOrders.map((id, index) => {
+    let taskData = convertedTasks[id];
     return <Card key={id} {...taskData} index={index} />;
   });
 });
 
-const Column = ({ id, index, title }) => {
+const Column = ({ id, index, title, taskOrders }) => {
   const dispatch = useDispatch();
   const [createTaskMutation, taskMutationResult] = useCreateTaskMutation();
   const [deleteColumnMutation, columnMutationResult] =
@@ -160,7 +162,7 @@ const Column = ({ id, index, title }) => {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList tasks={tasksForColumn} />
+                  <InnerList tasks={tasksForColumn} taskOrders={taskOrders} />
                   {provided.placeholder}
                 </TaskList>
               )}

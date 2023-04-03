@@ -17,7 +17,8 @@ import {
 import SideEditor from './SideEditor';
 import isEmpty from 'lodash.isempty';
 import LabelsList from '../labels/LabelsList';
-import { useGetTaskQuery } from 'api/ApiSlice';
+import { useGetTaskQuery, useDeleteTaskMutation } from 'api/ApiSlice';
+
 const Expanded = styled.div`
   border-radius: 0.375rem;
   background-color: #eee;
@@ -100,6 +101,7 @@ function ExpandedCard({ title, description, close, taskId }) {
   const { data: task, isSuccess } = useGetTaskQuery(taskId);
   const [sideEditorOpen, setSideEditorOpen] = useState(false);
   const [editorContent, setEditorContent] = useState('cover');
+  const [deleteTaskMutation, result] = useDeleteTaskMutation();
   // useEffect(() => {
   //   dispatch(fetchTask(taskId));
   // }, [dispatch, taskId]);
@@ -148,13 +150,14 @@ function ExpandedCard({ title, description, close, taskId }) {
 
   const handleDeleteTask = () => {
     close();
-    dispatch(
-      taskDeletion({
-        taskId: task.id,
-        columnId: task.columnId,
-      })
-    );
-    dispatch(deleteTask(task.id));
+    // dispatch(
+    //   taskDeletion({
+    //     taskId: task.id,
+    //     columnId: task.columnId,
+    //   })
+    // );
+    // dispatch(deleteTask(task.id));
+    deleteTaskMutation(task);
   };
 
   return (

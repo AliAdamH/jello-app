@@ -142,6 +142,31 @@ export const apiSlice = createApi({
         );
       },
     }),
+    deleteTask: builder.mutation({
+      query: (task) => ({
+        url: '/tasks',
+        method: 'DELETE',
+        body: { id: task.id },
+      }),
+      async onQueryStarted(task, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
+            // remove the task from the tasks
+            delete result.tasks[task.id];
+            // remove the taskId from the taskOrders.
+            result.columns[task.columnId].taskOrders = result.columns[
+              task.columnId
+            ].taskOrders.filter((taskId) => taskId !== Number(task.id));
+          })
+        );
+
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
@@ -152,4 +177,5 @@ export const {
   useCreateTaskMutation,
   useCreateColumnMutation,
   useDeleteColumnMutation,
+  useDeleteTaskMutation,
 } = apiSlice;

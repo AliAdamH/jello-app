@@ -17,6 +17,7 @@ import {
   useGetBoardDataQuery,
   useCreateTaskMutation,
   useDeleteColumnMutation,
+  useUpdateColumnMutation,
 } from 'api/ApiSlice';
 
 const Container = styled.div`
@@ -92,6 +93,7 @@ const Column = ({ id, index, title }) => {
   const [createTaskMutation, taskMutationResult] = useCreateTaskMutation();
   const [deleteColumnMutation, columnMutationResult] =
     useDeleteColumnMutation();
+  const [updateColumnMutation] = useUpdateColumnMutation();
   const selectTasksForColumn = useMemo(() => {
     const fallbackArray = [];
 
@@ -133,8 +135,7 @@ const Column = ({ id, index, title }) => {
       title: newTitle,
     };
 
-    dispatch(optimisticColumnTitleUpdate(columnObject));
-    dispatch(updateColumnTitle(columnObject));
+    updateColumnMutation(columnObject);
   };
 
   return (

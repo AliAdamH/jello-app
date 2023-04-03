@@ -167,6 +167,25 @@ export const apiSlice = createApi({
         }
       },
     }),
+    updateColumn: builder.mutation({
+      query: ({ columnId, title }) => ({
+        url: '/columns',
+        method: 'PUT',
+        body: { column: { id: columnId, title } },
+      }),
+      async onQueryStarted({ columnId, title }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
+            result.columns[columnId].title = title;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
@@ -178,4 +197,5 @@ export const {
   useCreateColumnMutation,
   useDeleteColumnMutation,
   useDeleteTaskMutation,
+  useUpdateColumnMutation,
 } = apiSlice;

@@ -14,7 +14,11 @@ import {
   taskInnerReorder,
   updateColumnOrder,
 } from './boardSlice';
-import { useGetBoardDataQuery, useCreateColumnMutation } from 'api/ApiSlice';
+import {
+  useGetBoardDataQuery,
+  useCreateColumnMutation,
+  useUpdateColumnOrderMutation,
+} from 'api/ApiSlice';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -54,6 +58,7 @@ function Board() {
   // const [loading, setLoading] = useState(true);
   const { isLoading: loading, data } = useGetBoardDataQuery();
   const [createColumnMutation, result] = useCreateColumnMutation();
+  const [updateColumnOrderMutation] = useUpdateColumnOrderMutation();
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -96,15 +101,10 @@ function Board() {
       //   colOrderIds: newColumnOrder,
       // };
 
-      dispatch(optimisticColumnDrag(newColumnOrder));
-
-      dispatch(
-        updateColumnOrder({
-          boardId: data.id,
-          newColOrderIds: newColumnOrder,
-        })
-      );
-
+      updateColumnOrderMutation({
+        boardId: data.id,
+        newColOrderIds: newColumnOrder,
+      });
       return;
     }
 

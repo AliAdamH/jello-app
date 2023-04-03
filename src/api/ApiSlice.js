@@ -186,6 +186,33 @@ export const apiSlice = createApi({
         }
       },
     }),
+    updateColumnOrder: builder.mutation({
+      query: ({ boardId, newColOrderIds }) => ({
+        url: '/order_columns',
+        method: 'PUT',
+        body: {
+          board: {
+            id: boardId,
+            col_order_ids: newColOrderIds,
+          },
+        },
+      }),
+      async onQueryStarted(
+        { boardId, newColOrderIds },
+        { dispatch, queryFulfilled }
+      ) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
+            result.colOrderIds = newColOrderIds;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
@@ -198,4 +225,5 @@ export const {
   useDeleteColumnMutation,
   useDeleteTaskMutation,
   useUpdateColumnMutation,
+  useUpdateColumnOrderMutation,
 } = apiSlice;

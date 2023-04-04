@@ -11,6 +11,7 @@ import {
   useUpdateTaskVerticalOrderMutation,
   useUpdateTaskHorizontalOrderMutation,
 } from 'api/ApiSlice';
+import TaskModal from './task/TaskModal';
 
 const BoardContainer = styled.div`
   background-image: url(${(props) => props.imageLink});
@@ -122,31 +123,38 @@ function Board() {
   return (
     <>
       {!loading && (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="columns" type="column" direction="horizontal">
-            {(provided) => (
-              <BoardContainer
-                imageLink={background}
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
-                {data.colOrderIds.map((col, idx) => {
-                  const column = data.columns[col];
-                  return (
-                    <ColumnsWrapper
-                      key={column.id}
-                      column={column}
-                      index={idx}
-                      boardId={data.id}
-                    />
-                  );
-                })}
-                {provided.placeholder}
-                <NewColumn handleNewColumn={handleNewColumn} />
-              </BoardContainer>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable
+              droppableId="columns"
+              type="column"
+              direction="horizontal"
+            >
+              {(provided) => (
+                <BoardContainer
+                  imageLink={background}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {data.colOrderIds.map((col, idx) => {
+                    const column = data.columns[col];
+                    return (
+                      <ColumnsWrapper
+                        key={column.id}
+                        column={column}
+                        index={idx}
+                        boardId={data.id}
+                      />
+                    );
+                  })}
+                  {provided.placeholder}
+                  <NewColumn handleNewColumn={handleNewColumn} />
+                </BoardContainer>
+              )}
+            </Droppable>
+          </DragDropContext>
+          <TaskModal boardId={data.id} />
+        </>
       )}
     </>
   );

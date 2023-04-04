@@ -1,24 +1,25 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 import { Draggable } from '@hello-pangea/dnd';
 import ExpandedCard from './ExpandedCard';
-import Modal from 'react-modal';
 import { createSelector } from '@reduxjs/toolkit';
 import { useGetBoardTasksQuery } from 'api/ApiSlice';
-Modal.setAppElement('#root');
-Modal.defaultStyles.overlay.backgroundColor = 'rgba(0,0,0, 0.6)';
-Modal.defaultStyles.overlay.overflowY = 'scroll';
+import { useDispatch } from 'react-redux';
+import { setOpenTaskId } from 'store/modalSlice';
+// Modal.setAppElement('#root');
+// Modal.defaultStyles.overlay.backgroundColor = 'rgba(0,0,0, 0.6)';
+// Modal.defaultStyles.overlay.overflowY = 'scroll';
 
-const StyledModal = styled(Modal)`
-  width: min(50vw, 764px);
-  background-color: #eee;
-  margin-top: 2rem;
-  margin-bottom: 3rem;
-  margin-inline: auto;
-  min-height: 800px;
-  border-radius: 0.375rem;
-  outline: none;
-`;
+// const StyledModal = styled(Modal)`
+//   width: min(50vw, 764px);
+//   background-color: #eee;
+//   margin-top: 2rem;
+//   margin-bottom: 3rem;
+//   margin-inline: auto;
+//   min-height: 800px;
+//   border-radius: 0.375rem;
+//   outline: none;
+// `;
 
 const CardContainer = styled.div`
   border-radius: 0.375rem;
@@ -50,6 +51,7 @@ const Label = styled.div`
 `;
 // { id, index, labels, title, coverColor, coverTextColor }
 const Card = ({ id, index, boardId }) => {
+  const dispatch = useDispatch();
   const selectTask = useMemo(() => {
     const fallbackArray = [];
 
@@ -71,6 +73,9 @@ const Card = ({ id, index, boardId }) => {
     }
   );
 
+  const openModal = useCallback(() => {
+    dispatch(setOpenTaskId(id));
+  }, [dispatch, id]);
   const [expanded, setExpanded] = useState(false);
   return (
     <>
@@ -78,7 +83,7 @@ const Card = ({ id, index, boardId }) => {
         <Draggable draggableId={String(id)} index={index}>
           {(provided, snapshot) => (
             <CardContainer
-              onClick={() => setExpanded(true)}
+              onClick={openModal}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
               ref={provided.innerRef}
@@ -102,17 +107,6 @@ const Card = ({ id, index, boardId }) => {
           )}
         </Draggable>
       )}
-      <StyledModal
-        isOpen={expanded}
-        shouldCloseOnOverlayClick={true}
-        onRequestClose={() => setExpanded(false)}
-      >
-        <ExpandedCard
-          boardId={boardId}
-          taskId={id}
-          close={() => setExpanded(false)}
-        />
-      </StyledModal>
     </>
   );
 };

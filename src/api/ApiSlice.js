@@ -240,6 +240,42 @@ export const apiSlice = createApi({
         }
       },
     }),
+    updateTaskHorizontalOrder: builder.mutation({
+      query: ({ initialColumn, targetColumn, taskId }) => ({
+        url: '/move_tasks',
+        method: 'PUT',
+        body: {
+          id: taskId,
+          to_col: {
+            id: targetColumn.id,
+            task_orders: targetColumn.taskOrders,
+          },
+          from_col: {
+            id: initialColumn.id,
+            task_orders: initialColumn.taskOrders,
+          },
+        },
+      }),
+      async onQueryStarted(
+        { initialColumn, targetColumn, taskId },
+        { dispatch, queryFulfilled }
+      ) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
+            result.columns[initialColumn.id].taskOrders =
+              initialColumn.taskOrders;
+            result.columns[targetColumn.id].taskOrders =
+              targetColumn.taskOrders;
+            result.tasks[taskId].columnId = Number(targetColumn.id);
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
@@ -254,4 +290,5 @@ export const {
   useUpdateColumnMutation,
   useUpdateColumnOrderMutation,
   useUpdateTaskVerticalOrderMutation,
+  useUpdateTaskHorizontalOrderMutation,
 } = apiSlice;

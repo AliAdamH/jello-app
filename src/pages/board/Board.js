@@ -19,6 +19,7 @@ import {
   useCreateColumnMutation,
   useUpdateColumnOrderMutation,
   useUpdateTaskVerticalOrderMutation,
+  useUpdateTaskHorizontalOrderMutation,
 } from 'api/ApiSlice';
 
 const BoardContainer = styled.div`
@@ -61,6 +62,8 @@ function Board() {
   const [createColumnMutation, result] = useCreateColumnMutation();
   const [updateColumnOrderMutation] = useUpdateColumnOrderMutation();
   const [taskVerticalReorderMutation] = useUpdateTaskVerticalOrderMutation();
+  const [taskHorizontalReorderMutation] =
+    useUpdateTaskHorizontalOrderMutation();
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -145,40 +148,38 @@ function Board() {
 
     const startTaskIds = [...start.taskOrders];
     startTaskIds.splice(source.index, 1);
-    const movedTask = start.tasks[draggableId];
-    const newTasks = filterTasks(start.tasks, draggableId);
+    // const movedTask = start.tasks[draggableId];
+    // const newTasks = filterTasks(start.tasks, draggableId);
     const newStart = {
       ...start,
       taskOrders: startTaskIds,
-      tasks: newTasks,
     };
 
     const finishTaskIds = [...finish.taskOrders];
-    finishTaskIds.splice(destination.index, 0, draggableId);
-    const newFinishTasks = { ...finish.tasks, [draggableId]: movedTask };
+    finishTaskIds.splice(destination.index, 0, Number(draggableId));
+    // const newFinishTasks = { ...finish.tasks, [draggableId]: movedTask };
     const newFinish = {
       ...finish,
       taskOrders: finishTaskIds,
-      tasks: newFinishTasks,
     };
     // UI Optimistic Update.
-    dispatch(
-      optimisticFullTaskReorder({
-        startColumnId: start.id,
-        finishColumnId: finish.id,
-        updatedStart: newStart,
-        updatedFinish: newFinish,
-      })
-    );
+    // dispatch(
+    //   optimisticFullTaskReorder({
+    //     startColumnId: start.id,
+    //     finishColumnId: finish.id,
+    //     updatedStart: newStart,
+    //     updatedFinish: newFinish,
+    //   })
+    // );
 
-    // Server side update.
-    dispatch(
-      fullTaskMovement({
-        taskId: draggableId,
-        targetColumn: newFinish,
-        initialColumn: newStart,
-      })
-    );
+    taskHorizontalReorderMutation({
+      taskId: draggableId,
+      targetColumn: newFinish,
+      initialColumn: newStart,
+    });
+    // dispatch(
+    //   fullTaskMovement()
+    // );
   };
 
   const handleNewColumn = (columnTitle) => {

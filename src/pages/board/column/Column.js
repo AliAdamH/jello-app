@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Card from 'pages/board/task/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
@@ -82,10 +82,16 @@ const MiscButton = styled.button`
   }
 `;
 
-const InnerList = React.memo(({ tasks, taskOrders }) => {
-  const convertedTasks = Object.fromEntries(tasks);
+const InnerList = React.memo(({ taskOrders }) => {
+  const convertedTasks = useGetBoardDataQuery().data.tasks;
   return taskOrders.map((id, index) => {
     let taskData = convertedTasks[id];
+    if (!taskData) {
+      console.log(convertedTasks);
+      console.log(taskOrders);
+      console.log(id);
+      console.log(`HERE IS HE! ${id}`);
+    }
     return <Card key={id} {...taskData} index={index} />;
   });
 });
@@ -114,6 +120,7 @@ const Column = ({ id, index, title, taskOrders }) => {
       tasksForColumn: selectTasksForColumn(result, id),
     }),
   });
+
   const [isHavingNewTask, setIsHavingNewTask] = useState(false);
 
   const removeNewTask = () => {
@@ -162,7 +169,7 @@ const Column = ({ id, index, title, taskOrders }) => {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList tasks={tasksForColumn} taskOrders={taskOrders} />
+                  <InnerList taskOrders={taskOrders} />
                   {provided.placeholder}
                 </TaskList>
               )}

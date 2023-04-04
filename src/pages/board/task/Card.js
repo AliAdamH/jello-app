@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { Draggable } from '@hello-pangea/dnd';
 import ExpandedCard from './ExpandedCard';
 import Modal from 'react-modal';
-
+import { createSelector } from '@reduxjs/toolkit';
+import { useGetBoardTasksQuery } from 'api/ApiSlice';
 Modal.setAppElement('#root');
 Modal.defaultStyles.overlay.backgroundColor = 'rgba(0,0,0, 0.6)';
 Modal.defaultStyles.overlay.overflowY = 'scroll';
@@ -48,42 +49,69 @@ const Label = styled.div`
   background-color: ${(props) => props.backgroundColor};
 `;
 // { id, index, labels, title, coverColor, coverTextColor }
-const Card = ({ id, index, labels, title, coverColor, coverTextColor }) => {
+const Card = ({ id, index, boardId }) => {
+  const selectTask = useMemo(() => {
+    const fallbackArray = [];
+
+    return createSelector(
+      (res) => res.data,
+      (res, taskId) => taskId,
+      (data, taskId) => {
+        return data[taskId];
+      }
+    );
+  }, []);
+  const { task, isLoading, isSuccess, isFetching } = useGetBoardTasksQuery(
+    boardId,
+    {
+      selectFromResult: (result) => ({
+        ...result,
+        task: selectTask(result, id),
+      }),
+    }
+  );
+
   const [expanded, setExpanded] = useState(false);
   return (
     <>
-      <Draggable draggableId={id} index={index}>
-        {(provided, snapshot) => (
-          <CardContainer
-            onClick={() => setExpanded(true)}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            ref={provided.innerRef}
-            isDragging={snapshot.isDragging}
-            bgColor={coverColor}
-            fontColor={coverTextColor}
-          >
-            <LabelsContainer>
-              {Object.keys(labels).map((k, _) => {
-                return (
-                  <Label
-                    key={k}
-                    borderColor={coverTextColor}
-                    backgroundColor={labels[k].color}
-                  />
-                );
-              })}
-            </LabelsContainer>
-            {title}
-          </CardContainer>
-        )}
-      </Draggable>
+      {isSuccess && !isFetching && (
+        <Draggable draggableId={String(id)} index={index}>
+          {(provided, snapshot) => (
+            <CardContainer
+              onClick={() => setExpanded(true)}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              ref={provided.innerRef}
+              isDragging={snapshot.isDragging}
+              bgColor={task.coverColor}
+              fontColor={task.coverTextColor}
+            >
+              <LabelsContainer>
+                {Object.keys(task.labels).map((k, _) => {
+                  return (
+                    <Label
+                      key={k}
+                      borderColor={task.coverTextColor}
+                      backgroundColor={task.labels[k].color}
+                    />
+                  );
+                })}
+              </LabelsContainer>
+              {task.title}
+            </CardContainer>
+          )}
+        </Draggable>
+      )}
       <StyledModal
         isOpen={expanded}
         shouldCloseOnOverlayClick={true}
         onRequestClose={() => setExpanded(false)}
       >
-        <ExpandedCard taskId={id} close={() => setExpanded(false)} />
+        <ExpandedCard
+          boardId={boardId}
+          taskId={id}
+          close={() => setExpanded(false)}
+        />
       </StyledModal>
     </>
   );

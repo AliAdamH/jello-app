@@ -11,6 +11,7 @@ import {
   useCreateTaskMutation,
   useDeleteColumnMutation,
   useUpdateColumnMutation,
+  useGetBoardTasksQuery,
 } from 'api/ApiSlice';
 
 const Container = styled.div`
@@ -75,44 +76,21 @@ const MiscButton = styled.button`
   }
 `;
 
-const InnerList = React.memo(({ taskOrders }) => {
-  const convertedTasks = useGetBoardDataQuery().data.tasks;
-  return taskOrders.map((id, index) => {
-    let taskData = convertedTasks[id];
-    if (!taskData) {
-      console.log(convertedTasks);
-      console.log(taskOrders);
-      console.log(id);
-      console.log(`HERE IS HE! ${id}`);
-    }
-    return <Card key={id} {...taskData} index={index} />;
-  });
+const InnerList = React.memo(({ taskOrders, boardId }) => {
+  const { isSuccess, isFetching } = useGetBoardTasksQuery(boardId);
+  if (isSuccess && !isFetching) {
+    return taskOrders.map((id, index) => {
+      return <Card key={id} id={id} index={index} boardId={boardId} />;
+    });
+  }
+  return <div>loading...</div>;
 });
 
-const Column = ({ id, index, title, taskOrders }) => {
+const Column = ({ id, index, title, taskOrders, boardId }) => {
   const [createTaskMutation, taskMutationResult] = useCreateTaskMutation();
   const [deleteColumnMutation, columnMutationResult] =
     useDeleteColumnMutation();
   const [updateColumnMutation] = useUpdateColumnMutation();
-  const selectTasksForColumn = useMemo(() => {
-    const fallbackArray = [];
-
-    return createSelector(
-      (res) => res.data,
-      (res, columnId) => columnId,
-      (data, columnId) =>
-        Object.entries(data?.tasks).filter(([_, hash]) => {
-          return hash.columnId === columnId;
-        }) ?? fallbackArray
-    );
-  }, []);
-  const { tasksForColumn } = useGetBoardDataQuery(undefined, {
-    selectFromResult: (result) => ({
-      ...result,
-      tasksForColumn: selectTasksForColumn(result, id),
-    }),
-  });
-
   const [isHavingNewTask, setIsHavingNewTask] = useState(false);
 
   const removeNewTask = () => {
@@ -122,12 +100,13 @@ const Column = ({ id, index, title, taskOrders }) => {
   const addTask = (titleValue) => {
     createTaskMutation({
       task: { column_id: id, title: titleValue },
+      boardId,
     });
     setIsHavingNewTask(false);
   };
 
   const handleColumnDeletion = () => {
-    deleteColumnMutation({ columnId: id });
+    deleteColumnMutation({ columnId: id, boardId });
   };
 
   const handleTitleUpdate = (newTitle) => {
@@ -160,7 +139,7 @@ const Column = ({ id, index, title, taskOrders }) => {
                   {...provided.droppableProps}
                   isDraggingOver={snapshot.isDraggingOver}
                 >
-                  <InnerList taskOrders={taskOrders} />
+                  <InnerList taskOrders={taskOrders} boardId={boardId} />
                   {provided.placeholder}
                 </TaskList>
               )}

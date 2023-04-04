@@ -31,8 +31,8 @@ const BoardContainer = styled.div`
 `;
 
 const ColumnsWrapper = React.memo((props) => {
-  const { column, index } = props;
-  return <Column {...column} index={index} />;
+  const { column, index, boardId } = props;
+  return <Column boardId={boardId} {...column} index={index} />;
 });
 
 function Board() {
@@ -85,6 +85,7 @@ function Board() {
       taskVerticalReorderMutation({
         columnId: start.id,
         newTaskIds,
+        boardId: data.id,
       });
       return;
     }
@@ -136,6 +137,7 @@ function Board() {
                       key={column.id}
                       column={column}
                       index={idx}
+                      boardId={data.id}
                     />
                   );
                 })}

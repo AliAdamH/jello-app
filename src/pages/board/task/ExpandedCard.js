@@ -98,7 +98,7 @@ const SideEditorContainer = styled.div`
   box-shadow: 0 0 1em rgba(0 0 0 / 0.6);
 `;
 
-function ExpandedCard({ close, taskId }) {
+function ExpandedCard({ close, taskId, boardId }) {
   const dispatch = useDispatch();
   const { data: task, isSuccess } = useGetTaskQuery(taskId);
   const [sideEditorOpen, setSideEditorOpen] = useState(false);
@@ -110,8 +110,11 @@ function ExpandedCard({ close, taskId }) {
     // dispatch(handleTitleChange(newTitleValue));
     // dispatch(updateTask());
     taskUpdateMutation({
-      ...task,
-      title: newTitleValue,
+      task: {
+        ...task,
+        title: newTitleValue,
+      },
+      boardId,
     });
   };
 
@@ -146,7 +149,7 @@ function ExpandedCard({ close, taskId }) {
 
   const handleDeleteTask = () => {
     close();
-    deleteTaskMutation(task);
+    deleteTaskMutation({ task, boardId });
   };
 
   return (

@@ -18,33 +18,33 @@ export const apiSlice = createApi({
         return [{ type: 'Task', id: result.id }];
       },
     }),
+    getBoardTasks: builder.query({
+      query: (boardId) => `/tasks?board=${boardId}`,
+      providesTags: (result, error, arg) => {
+        return Object.keys(result).map((id) => {
+          return { type: 'Task', id };
+        });
+      },
+    }),
     createTask: builder.mutation({
-      query: (taskData) => ({
+      query: ({ task, boardId }) => ({
         url: '/tasks',
         method: 'POST',
-        body: taskData,
+        body: { task },
       }),
-      async onQueryStarted(taskData, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ task, boardId }, { dispatch, queryFulfilled }) {
         const { data: newTask } = await queryFulfilled;
         dispatch(
-          apiSlice.util.updateQueryData('getBoardData', undefined, (draft) => {
-            return Object.assign(draft, {
-              ...draft,
-              columns: {
-                ...draft.columns,
-                [newTask.columnId]: {
-                  ...draft.columns[newTask.columnId],
-                  taskOrders: [
-                    ...draft.columns[newTask.columnId].taskOrders,
-                    Number(newTask.id),
-                  ],
-                },
-              },
-              tasks: {
-                ...draft.tasks,
-                [newTask.id]: newTask,
-              },
-            });
+          apiSlice.util.updateQueryData('getBoardTasks', boardId, (result) => {
+            result[newTask.id] = newTask;
+          })
+        );
+
+        dispatch(
+          apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
+            result.columns[newTask.columnId].taskOrders.push(
+              Number(newTask.id)
+            );
           })
         );
       },
@@ -77,12 +77,15 @@ export const apiSlice = createApi({
       },
     }),
     deleteColumn: builder.mutation({
-      query: ({ columnId }) => ({
+      query: ({ columnId, boardId }) => ({
         url: '/columns',
         method: 'DELETE',
         body: { id: columnId },
       }),
-      async onQueryStarted({ columnId }, { dispatch, queryFulfilled }) {
+      async onQueryStarted(
+        { columnId, boardId },
+        { dispatch, queryFulfilled }
+      ) {
         /*
         const patchResult = dispatch(
           apiSlice.util.updateQueryData(
@@ -123,50 +126,57 @@ export const apiSlice = createApi({
         }
         */
         await queryFulfilled;
+        // remove the column
         dispatch(
           apiSlice.util.updateQueryData(
             'getBoardData',
             undefined,
             (boardData) => {
-              const newTasks = Object.entries(boardData.tasks).filter(
-                ([id, task]) => {
-                  return Number(task.columnId) !== Number(columnId);
-                }
-              );
-              const { [columnId]: _discard, ...restOfColumns } =
-                boardData.columns;
-              boardData.columns = restOfColumns;
               boardData.colOrderIds = boardData.colOrderIds.filter(
                 (id) => id !== Number(columnId)
               );
-              boardData.tasks = Object.fromEntries(newTasks);
+              delete boardData.columns[columnId];
             }
           )
+        );
+        // remove the tasks.
+        dispatch(
+          apiSlice.util.updateQueryData('getBoardTasks', boardId, (result) => {
+            Object.keys(result).forEach((taskId) => {
+              if (result[taskId].columnId === columnId) {
+                delete result[taskId];
+              }
+            });
+          })
         );
       },
     }),
     deleteTask: builder.mutation({
-      query: (task) => ({
+      query: ({ task, boardId }) => ({
         url: '/tasks',
         method: 'DELETE',
         body: { id: task.id },
       }),
-      async onQueryStarted(task, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ task, boardId }, { dispatch, queryFulfilled }) {
+        // remove from colOrders then remove from task query cache
         const patchResult = dispatch(
           apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
-            // remove the task from the tasks
-            delete result.tasks[task.id];
             // remove the taskId from the taskOrders.
             result.columns[task.columnId].taskOrders = result.columns[
               task.columnId
             ].taskOrders.filter((taskId) => taskId !== Number(task.id));
           })
         );
-
+        const taskPatchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardTasks', boardId, (result) => {
+            delete result[task.id];
+          })
+        );
         try {
           await queryFulfilled;
         } catch (error) {
           patchResult.undo();
+          taskPatchResult.undo();
         }
       },
     }),
@@ -244,7 +254,7 @@ export const apiSlice = createApi({
       },
     }),
     updateTaskHorizontalOrder: builder.mutation({
-      query: ({ initialColumn, targetColumn, taskId }) => ({
+      query: ({ initialColumn, targetColumn, taskId, boardId }) => ({
         url: '/move_tasks',
         method: 'PUT',
         body: {
@@ -260,35 +270,47 @@ export const apiSlice = createApi({
         },
       }),
       async onQueryStarted(
-        { initialColumn, targetColumn, taskId },
+        { initialColumn, targetColumn, taskId, boardId },
         { dispatch, queryFulfilled }
       ) {
+        // update the columns
         const patchResult = dispatch(
           apiSlice.util.updateQueryData('getBoardData', undefined, (result) => {
             result.columns[initialColumn.id].taskOrders =
               initialColumn.taskOrders;
             result.columns[targetColumn.id].taskOrders =
               targetColumn.taskOrders;
-            result.tasks[taskId].columnId = Number(targetColumn.id);
+          })
+        );
+        // update the tasks
+        const taskPatchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardTasks', boardId, (result) => {
+            result[taskId].columnId = targetColumn.id;
           })
         );
         try {
           await queryFulfilled;
         } catch {
           patchResult.undo();
+          taskPatchResult.undo();
         }
       },
     }),
     updateTaskData: builder.mutation({
-      query: (task) => ({
+      query: ({ task, boardId }) => ({
         url: '/tasks',
         method: 'PUT',
         body: { task },
       }),
-      async onQueryStarted(task, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ task, boardId }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
           apiSlice.util.updateQueryData('getTask', task.id, (result) => {
             result = task;
+          })
+        );
+        const taskBoardPatchResult = dispatch(
+          apiSlice.util.updateQueryData('getBoardTasks', boardId, (result) => {
+            result[task.id] = task;
           })
         );
         try {
@@ -308,6 +330,7 @@ export const {
   useGetBoardDataQuery,
   useGetBoardLabelsQuery,
   useGetTaskQuery,
+  useGetBoardTasksQuery,
   useCreateTaskMutation,
   useCreateColumnMutation,
   useDeleteColumnMutation,

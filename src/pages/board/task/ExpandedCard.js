@@ -16,7 +16,11 @@ import {
 import SideEditor from './SideEditor';
 import isEmpty from 'lodash.isempty';
 import LabelsList from '../labels/LabelsList';
-import { useGetTaskQuery, useDeleteTaskMutation } from 'api/ApiSlice';
+import {
+  useGetTaskQuery,
+  useDeleteTaskMutation,
+  useUpdateTaskDataMutation,
+} from 'api/ApiSlice';
 
 const Expanded = styled.div`
   border-radius: 0.375rem;
@@ -100,16 +104,15 @@ function ExpandedCard({ close, taskId }) {
   const [sideEditorOpen, setSideEditorOpen] = useState(false);
   const [editorContent, setEditorContent] = useState('cover');
   const [deleteTaskMutation] = useDeleteTaskMutation();
+  const [taskUpdateMutation] = useUpdateTaskDataMutation();
 
   const handleTitleUpdate = (newTitleValue) => {
-    dispatch(handleTitleChange(newTitleValue));
-    dispatch(updateTask());
-    dispatch(
-      taskTitleUpdate({
-        ...task,
-        title: newTitleValue,
-      })
-    );
+    // dispatch(handleTitleChange(newTitleValue));
+    // dispatch(updateTask());
+    taskUpdateMutation({
+      ...task,
+      title: newTitleValue,
+    });
   };
 
   const handleDescriptionUpdate = (newDescriptionValue) => {

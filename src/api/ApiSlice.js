@@ -14,6 +14,9 @@ export const apiSlice = createApi({
     }),
     getTask: builder.query({
       query: (taskId) => `/tasks/${taskId}`,
+      providesTags: (result, error, arg) => {
+        return [{ type: 'Task', id: result.id }];
+      },
     }),
     createTask: builder.mutation({
       query: (taskData) => ({
@@ -276,6 +279,28 @@ export const apiSlice = createApi({
         }
       },
     }),
+    updateTaskData: builder.mutation({
+      query: (task) => ({
+        url: '/tasks',
+        method: 'PUT',
+        body: { task },
+      }),
+      async onQueryStarted(task, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData('getTask', task.id, (result) => {
+            result = task;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [{ type: 'Task', id: arg.id }];
+      },
+    }),
   }),
 });
 
@@ -291,4 +316,5 @@ export const {
   useUpdateColumnOrderMutation,
   useUpdateTaskVerticalOrderMutation,
   useUpdateTaskHorizontalOrderMutation,
+  useUpdateTaskDataMutation,
 } = apiSlice;

@@ -63,7 +63,7 @@ const Card = ({ id, index, labels, title, coverColor, coverTextColor }) => {
             bgColor={coverColor}
             fontColor={coverTextColor}
           >
-            {/* <LabelsContainer>
+            <LabelsContainer>
               {Object.keys(labels).map((k, _) => {
                 return (
                   <Label
@@ -73,7 +73,7 @@ const Card = ({ id, index, labels, title, coverColor, coverTextColor }) => {
                   />
                 );
               })}
-            </LabelsContainer> */}
+            </LabelsContainer>
             {title}
           </CardContainer>
         )}

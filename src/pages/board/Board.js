@@ -4,16 +4,6 @@ import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from './column/Column';
 import NewColumn from './column/NewColumn';
-import { useDispatch } from 'react-redux';
-import {
-  fullTaskMovement,
-  newColumn,
-  optimisticColumnDrag,
-  optimisticFullTaskReorder,
-  optimisticInnerTaskReorder,
-  taskInnerReorder,
-  updateColumnOrder,
-} from './boardSlice';
 import {
   useGetBoardDataQuery,
   useCreateColumnMutation,
@@ -40,44 +30,18 @@ const BoardContainer = styled.div`
   }
 `;
 
-const filterTasks = (tasks, taskToRemoveId) => {
-  const deepCopy = JSON.parse(JSON.stringify(tasks));
-  return Object.keys(deepCopy)
-    .filter((key) => key !== taskToRemoveId)
-    .reduce((obj, key) => {
-      return (obj[key] = { ...obj, [key]: deepCopy[key] });
-    }, {});
-};
-
 const ColumnsWrapper = React.memo((props) => {
   const { column, index } = props;
   return <Column {...column} index={index} />;
 });
 
 function Board() {
-  // const data = useSelector((state) => state.boards.data);
-  // const dataStatus = useSelector((state) => state.boards.status);
-  // const [loading, setLoading] = useState(true);
   const { isLoading: loading, data } = useGetBoardDataQuery();
-  const [createColumnMutation, result] = useCreateColumnMutation();
+  const [createColumnMutation] = useCreateColumnMutation();
   const [updateColumnOrderMutation] = useUpdateColumnOrderMutation();
   const [taskVerticalReorderMutation] = useUpdateTaskVerticalOrderMutation();
   const [taskHorizontalReorderMutation] =
     useUpdateTaskHorizontalOrderMutation();
-  const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   if (dataStatus === 'idle') {
-  //     dispatch(fetchBoardData());
-  //     dispatch(fetchLabelsOfBoard());
-  //   }
-  // }, [dataStatus, dispatch]);
-
-  // useEffect(() => {
-  //   if (dataStatus === 'success') {
-  //     setLoading(false);
-  //   }
-  // }, [dataStatus]);
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
@@ -101,11 +65,6 @@ function Board() {
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
 
-      // const newState = {
-      //   ...data,
-      //   colOrderIds: newColumnOrder,
-      // };
-
       updateColumnOrderMutation({
         boardId: data.id,
         newColOrderIds: newColumnOrder,
@@ -123,20 +82,6 @@ function Board() {
       const newTaskIds = Array.from(start.taskOrders);
       newTaskIds.splice(source.index, 1);
       newTaskIds.splice(destination.index, 0, Number(draggableId));
-      //
-      // dispatch(
-      // optimisticInnerTaskReorder({
-      // columnId: start.id,
-      // newTaskOrders: newTaskIds,
-      // })
-      // );
-      //
-      // dispatch(
-      // taskInnerReorder({
-      // columnId: start.id,
-      // taskOrderIds: newTaskIds,
-      // })
-      // );
       taskVerticalReorderMutation({
         columnId: start.id,
         newTaskIds,
@@ -148,8 +93,6 @@ function Board() {
 
     const startTaskIds = [...start.taskOrders];
     startTaskIds.splice(source.index, 1);
-    // const movedTask = start.tasks[draggableId];
-    // const newTasks = filterTasks(start.tasks, draggableId);
     const newStart = {
       ...start,
       taskOrders: startTaskIds,
@@ -157,29 +100,16 @@ function Board() {
 
     const finishTaskIds = [...finish.taskOrders];
     finishTaskIds.splice(destination.index, 0, Number(draggableId));
-    // const newFinishTasks = { ...finish.tasks, [draggableId]: movedTask };
     const newFinish = {
       ...finish,
       taskOrders: finishTaskIds,
     };
-    // UI Optimistic Update.
-    // dispatch(
-    //   optimisticFullTaskReorder({
-    //     startColumnId: start.id,
-    //     finishColumnId: finish.id,
-    //     updatedStart: newStart,
-    //     updatedFinish: newFinish,
-    //   })
-    // );
 
     taskHorizontalReorderMutation({
       taskId: draggableId,
       targetColumn: newFinish,
       initialColumn: newStart,
     });
-    // dispatch(
-    //   fullTaskMovement()
-    // );
   };
 
   const handleNewColumn = (columnTitle) => {

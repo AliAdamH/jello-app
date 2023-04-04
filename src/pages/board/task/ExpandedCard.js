@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import CardActivityFeed from './CardActivityFeed';
 import EditableDescription from './EditableDescription';
 import EditableTitle from './EditableTitle';
 import ExpandedCardActions from './ExpandedCardActions';
-import { deleteTask, taskDeletion, taskTitleUpdate } from '../boardSlice';
+import { taskTitleUpdate } from '../boardSlice';
 import {
-  fetchTask,
   handleTitleChange,
   updateTask,
   resetTaskState,
@@ -95,16 +94,12 @@ const SideEditorContainer = styled.div`
   box-shadow: 0 0 1em rgba(0 0 0 / 0.6);
 `;
 
-function ExpandedCard({ title, description, close, taskId }) {
+function ExpandedCard({ close, taskId }) {
   const dispatch = useDispatch();
-  const status = useSelector((state) => state.tasks.status);
   const { data: task, isSuccess } = useGetTaskQuery(taskId);
   const [sideEditorOpen, setSideEditorOpen] = useState(false);
   const [editorContent, setEditorContent] = useState('cover');
-  const [deleteTaskMutation, result] = useDeleteTaskMutation();
-  // useEffect(() => {
-  //   dispatch(fetchTask(taskId));
-  // }, [dispatch, taskId]);
+  const [deleteTaskMutation] = useDeleteTaskMutation();
 
   const handleTitleUpdate = (newTitleValue) => {
     dispatch(handleTitleChange(newTitleValue));
@@ -122,8 +117,6 @@ function ExpandedCard({ title, description, close, taskId }) {
     dispatch(updateTask());
   };
 
-  // Is the card overdue ? Use the local date to send answer
-  // to server.
   useEffect(() => {
     if (isSuccess) {
       const clientCurrentDate = new Date().toLocaleDateString('en-CA');
@@ -150,13 +143,6 @@ function ExpandedCard({ title, description, close, taskId }) {
 
   const handleDeleteTask = () => {
     close();
-    // dispatch(
-    //   taskDeletion({
-    //     taskId: task.id,
-    //     columnId: task.columnId,
-    //   })
-    // );
-    // dispatch(deleteTask(task.id));
     deleteTaskMutation(task);
   };
 

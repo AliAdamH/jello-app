@@ -1,16 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Card from 'pages/board/task/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
 import NewTask from 'pages/board/task/NewTask';
 import { FaTrash } from 'react-icons/fa';
-import {
-  columnDeletion,
-  deleteColumn,
-  optimisticColumnTitleUpdate,
-  updateColumnTitle,
-} from 'pages/board/boardSlice';
-import { useDispatch } from 'react-redux';
 import EditableColumnTitle from './EditableColumnTitle';
 import { createSelector } from '@reduxjs/toolkit';
 import {
@@ -97,7 +90,6 @@ const InnerList = React.memo(({ taskOrders }) => {
 });
 
 const Column = ({ id, index, title, taskOrders }) => {
-  const dispatch = useDispatch();
   const [createTaskMutation, taskMutationResult] = useCreateTaskMutation();
   const [deleteColumnMutation, columnMutationResult] =
     useDeleteColumnMutation();
@@ -157,7 +149,6 @@ const Column = ({ id, index, title, taskOrders }) => {
                 title={title}
                 handleTitleUpdate={handleTitleUpdate}
               />
-              {/* <Title {...provided.dragHandleProps}>{title}</Title> */}
               <DeleteButton onClick={handleColumnDeletion}>
                 <FaTrash fontSize={'12px'} />
               </DeleteButton>

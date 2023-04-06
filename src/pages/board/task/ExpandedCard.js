@@ -189,6 +189,7 @@ function ExpandedCard({ close, taskId, boardId }) {
                 taskId={taskId}
                 editorToRender={editorContent}
                 closeEditor={() => setSideEditorOpen(false)}
+                boardId={boardId}
               />
             </SideEditorContainer>
           ) : (

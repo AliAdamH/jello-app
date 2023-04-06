@@ -1,78 +1,58 @@
 import React, { useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
-import { updateTask } from './taskSlice';
-import { handleCoverColorChange } from './taskSlice';
-import { taskCoverColorUpdate } from '../boardSlice';
-import { useGetTaskQuery } from 'api/ApiSlice';
+import { useGetTaskQuery, useUpdateTaskDataMutation } from 'api/ApiSlice';
 import invert from 'invert-color';
+import { Flex, Text, Button, chakra } from '@chakra-ui/react';
 
-const ColorInput = styled.input`
-  appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  height: 5rem;
-  padding: 0;
-  width: 5rem;
-  margin-inline: auto;
-`;
+const CustomColorInput = chakra('input', {
+  baseStyle: {
+    appearance: 'none',
+    MozAppearance: 'none',
+    WebkitAppearance: 'none',
+    background: 'none',
+    border: 0,
+    cursor: 'pointer',
+    height: '5rem',
+    width: '5rem',
+    marginInline: 'auto',
+    padding: 0,
+  },
+});
 
-const ActionButton = styled.button`
-  padding-inline: 0.75rem;
-  padding-block: 0.5rem;
-  border-radius: 0.375rem;
-  background-color: ${(props) => props.bgColor};
-  transition: opacity 0.3s ease;
-  margin-left: auto;
-  &:hover {
-    opacity: 0.7;
-  }
-`;
-function CoverEditor({ closeEditor, taskId }) {
+function CoverEditor({ closeEditor, taskId, boardId }) {
   const { data: task } = useGetTaskQuery(taskId);
+  const [taskDataMutation] = useUpdateTaskDataMutation();
   const coverColorRef = useRef(null);
 
-  const dispatch = useDispatch();
   const handleCoverColorUpdate = () => {
     const newCoverColor = coverColorRef.current.value;
     if (newCoverColor !== task.coverColor) {
       let newCoverTextColor = invert(newCoverColor, true);
-      dispatch(handleCoverColorChange({ newCoverColor, newCoverTextColor }));
-      dispatch(updateTask());
-      dispatch(
-        taskCoverColorUpdate({
+      taskDataMutation({
+        task: {
           ...task,
           coverColor: newCoverColor,
           coverTextColor: newCoverTextColor,
-        })
-      );
+        },
+        boardId,
+      });
     }
     closeEditor();
   };
 
   return (
-    <>
-      <div
-        style={{
-          marginInline: 'auto',
-          borderBottom: '4px solid limegreen',
-          paddingBlock: '0.5rem',
-        }}
-      >
+    <Flex direction="column" gap={4}>
+      <Text mx="auto" py={2} borderBottom="3px solid" borderColor={'gray.200'}>
         Choose a new color for your card
-      </div>
-      <ColorInput
+      </Text>
+      <CustomColorInput
         ref={coverColorRef}
         type={'color'}
         defaultValue={task.coverColor}
       />
-      <ActionButton bgColor={'lightblue'} onClick={handleCoverColorUpdate}>
+      <Button bg="green.400" onClick={handleCoverColorUpdate}>
         Save
-      </ActionButton>
-    </>
+      </Button>
+    </Flex>
   );
 }
 

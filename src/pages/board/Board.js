@@ -11,29 +11,44 @@ import {
   useUpdateTaskHorizontalOrderMutation,
 } from 'api/ApiSlice';
 import TaskModal from './task/TaskModal';
-import { Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 
 const _testBackgroundUrl =
   "url('https://images.unsplash.com/photo-1680675805063-3aa8b3607b0a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80')";
 const containerProps = {
   backgroundPosition: 'center',
   backgroundSize: 'cover',
-  mt: 14,
+  mt: 10,
   h: '92vh',
-  px: 4,
-  py: 4,
+  mr: 8,
+  pl: 4,
+  py: 8,
   gap: 2,
   maxWidth: 'full',
   maxHeight: 'calc(100vh - 56px)',
-  overflowX: 'auto',
   alignItems: 'flex-start',
+  position: 'absolute',
+};
+
+const backgroundProps = {
+  backgroundPosition: 'center',
+  backgroundSize: 'cover',
+  width: '100vw',
+  maxWidth: 'full',
+  mt: 14,
+  h: '100vh',
+  zIndex: -1,
 };
 
 const BoardContainer = styled.div``;
 
 const ColumnsWrapper = React.memo((props) => {
   const { column, index, boardId } = props;
-  return <Column boardId={boardId} {...column} index={index} />;
+  return (
+    <Box flexShrink={0}>
+      <Column boardId={boardId} {...column} index={index} />
+    </Box>
+  );
 });
 
 function Board() {
@@ -135,10 +150,13 @@ function Board() {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  <Flex
-                    {...containerProps}
+                  <Box
                     backgroundImage={_testBackgroundUrl}
-                  >
+                    position="fixed"
+                    {...backgroundProps}
+                    top={0}
+                  />
+                  <Flex {...containerProps}>
                     {data.colOrderIds.map((col, idx) => {
                       const column = data.columns[col];
                       return (

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-
+import { Box } from '@chakra-ui/react';
 const TextInput = styled.input`
   padding: 0.625rem;
   border-radius: 0.375rem;
@@ -83,26 +83,30 @@ const NewColumn = ({ handleNewColumn }) => {
     }
   };
 
-  return addingIsActive ? (
-    <FormWrapper>
-      <TextInput
-        ref={columnTitleField}
-        onBlur={handleFocusOut}
-        type={'text'}
-        name="title"
-        placeholder="Enter your column's title..."
-      />
-      <FormActionWrapper>
-        <AddColumnButton onClick={handleAddColumn}>Add</AddColumnButton>
-        <CancelButton onClick={() => setAddingIsActive(false)}>
-          Cancel
-        </CancelButton>
-      </FormActionWrapper>
-    </FormWrapper>
-  ) : (
-    <FloatyButton onClick={() => setAddingIsActive(true)}>
-      + Add a new column
-    </FloatyButton>
+  return (
+    <Box flexShrink={0}>
+      {addingIsActive ? (
+        <FormWrapper>
+          <TextInput
+            ref={columnTitleField}
+            onBlur={handleFocusOut}
+            type={'text'}
+            name="title"
+            placeholder="Enter your column's title..."
+          />
+          <FormActionWrapper>
+            <AddColumnButton onClick={handleAddColumn}>Add</AddColumnButton>
+            <CancelButton onClick={() => setAddingIsActive(false)}>
+              Cancel
+            </CancelButton>
+          </FormActionWrapper>
+        </FormWrapper>
+      ) : (
+        <FloatyButton onClick={() => setAddingIsActive(true)}>
+          + Add a new column
+        </FloatyButton>
+      )}
+    </Box>
   );
 };
 

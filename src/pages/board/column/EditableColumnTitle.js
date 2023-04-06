@@ -1,21 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-
-const EditInput = styled.input`
-  font-size: 1rem;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-  border: 1px solid lightgray;
-`;
-
-const Title = styled.h3`
-  padding: 0.75rem;
-  background-color: #eee;
-`;
-
-const Wrapper = styled.div`
-  flex: 1;
-`;
+import { Box, Heading, Input } from '@chakra-ui/react';
 
 function EditableColumnTitle({ title, handleTitleUpdate }) {
   const [isBeingEdited, setIsBeingEdited] = useState(false);
@@ -28,18 +12,25 @@ function EditableColumnTitle({ title, handleTitleUpdate }) {
   };
 
   return (
-    <Wrapper>
+    <Box flex={1} p={4}>
       {isBeingEdited ? (
-        <EditInput
+        <Input
+          p={1}
           autoFocus={true}
           type={'text'}
           defaultValue={title}
           onBlur={checkIfChanged}
         />
       ) : (
-        <Title onClick={() => setIsBeingEdited(true)}>{title}</Title>
+        <Heading
+          fontSize={'lg'}
+          as={'h3'}
+          onClick={() => setIsBeingEdited(true)}
+        >
+          {title}
+        </Heading>
       )}
-    </Wrapper>
+    </Box>
   );
 }
 

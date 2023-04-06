@@ -1,18 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Card from 'pages/board/task/Card';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
 import NewTask from 'pages/board/task/NewTask';
 import { FaTrash } from 'react-icons/fa';
 import EditableColumnTitle from './EditableColumnTitle';
-import { createSelector } from '@reduxjs/toolkit';
 import {
-  useGetBoardDataQuery,
   useCreateTaskMutation,
   useDeleteColumnMutation,
   useUpdateColumnMutation,
   useGetBoardTasksQuery,
 } from 'api/ApiSlice';
+import { Box, Button, Flex } from '@chakra-ui/react';
 
 const Container = styled.div`
   border: 1px solid lightgray;
@@ -21,59 +20,6 @@ const Container = styled.div`
   background-color: #eee;
   display: flex;
   flex-direction: column;
-`;
-
-const TaskList = styled.div`
-  min-height: 1rem;
-  flex: 1;
-  padding: 0.5rem;
-  transition: background-color 0.2s ease;
-  background-color: ${(props) => (props.isDraggingOver ? 'skyblue' : '#eee')};
-`;
-
-const Footer = styled.div`
-  padding: 0.2rem;
-  background-color: #eee;
-  display: flex;
-`;
-
-const NewCardButton = styled.button`
-  padding: 0.3rem;
-  border-radius: 0.25rem;
-  flex: 1;
-  text-align: start;
-  transition: background-color 0.2s ease;
-  &:hover {
-    background-color: #ddd;
-  }
-`;
-
-const TitleWrapper = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  padding-inline: 0.5rem;
-`;
-
-const DeleteButton = styled.button`
-  padding-block: 0.5rem;
-  padding-inline: 0.75rem;
-  transtition: background-color 0.35s ease;
-  border-radius: 0.375rem;
-  &:hover {
-    background-color: #ddd;
-  }
-`;
-
-const MiscButton = styled.button`
-  padding-block: 0.3rem;
-  padding-inline: 0.4rem;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #ddd;
-  }
 `;
 
 const InnerList = React.memo(({ taskOrders, boardId }) => {
@@ -123,34 +69,62 @@ const Column = ({ id, index, title, taskOrders, boardId }) => {
       <Draggable draggableId={id} index={index}>
         {(provided) => (
           <Container ref={provided.innerRef} {...provided.draggableProps}>
-            <TitleWrapper {...provided.dragHandleProps}>
+            <Box
+              display={'flex'}
+              alignItems="center"
+              gap={1}
+              px={2}
+              {...provided.dragHandleProps}
+            >
               <EditableColumnTitle
                 title={title}
                 handleTitleUpdate={handleTitleUpdate}
               />
-              <DeleteButton onClick={handleColumnDeletion}>
+              <Button px={3} py={2} onClick={handleColumnDeletion}>
                 <FaTrash fontSize={'12px'} />
-              </DeleteButton>
-            </TitleWrapper>
+              </Button>
+            </Box>
+
             <Droppable type="task" droppableId={id}>
               {(provided, snapshot) => (
-                <TaskList
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  isDraggingOver={snapshot.isDraggingOver}
+                <Flex
+                  direction={'column'}
+                  overflow={'hidden'}
+                  overflowY="auto"
+                  maxHeight={'calc(100vh - 256px)'}
+                  gap={2}
+                  pr={0.5}
                 >
-                  <InnerList taskOrders={taskOrders} boardId={boardId} />
-                  {provided.placeholder}
-                </TaskList>
+                  <Box
+                    minHeight={4}
+                    padding={2}
+                    /* bg={snapshot.isDraggingOver ? 'blue.400' : '#eee'}*/
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    <InnerList taskOrders={taskOrders} boardId={boardId} />
+                    {provided.placeholder}
+                  </Box>
+                </Flex>
               )}
             </Droppable>
-            <Footer>
+            <Flex>
               {!isHavingNewTask ? (
                 <>
-                  <NewCardButton onClick={() => setIsHavingNewTask(true)}>
+                  <Button
+                    w="full"
+                    display={'flex'}
+                    justifyContent="flex-start"
+                    fontSize={'sm'}
+                    _hover={{ bg: 'blackAlpha.200' }}
+                    fontWeight="normal"
+                    px={2}
+                    py={0}
+                    onClick={() => setIsHavingNewTask(true)}
+                  >
                     + Add a new card
-                  </NewCardButton>
-                  <MiscButton> &#9883; </MiscButton>
+                  </Button>
+                  <Button> &#9883; </Button>
                 </>
               ) : (
                 <>
@@ -160,7 +134,7 @@ const Column = ({ id, index, title, taskOrders, boardId }) => {
                   />
                 </>
               )}
-            </Footer>
+            </Flex>
           </Container>
         )}
       </Draggable>

@@ -1,87 +1,42 @@
 import React from 'react';
-import styled from 'styled-components';
-import { FaChartBar, FaUser } from 'react-icons/fa';
-
-const Activity = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
-`;
-
-const CommentActivity = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-`;
-
-const CommentField = styled.input`
-  padding-inline: 0.5rem;
-  padding-block: 0.5rem;
-  width: 100%;
-  border: 1px solid lightgray;
-  border-radius: 0.375rem;
-`;
-
-const ActivityUser = styled.div`
-  height: 32px;
-  width: 32px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background-color: white;
-  box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.1) inset;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ActivityText = styled.p`
-  padding-inline: 0.5rem;
-  font-size: 0.825rem;
-  line-height: 1.5;
-`;
+import { FaChartBar } from 'react-icons/fa';
+import { Avatar, Flex, Heading, Icon, Input, Text } from '@chakra-ui/react';
 
 function CardActivityFeed() {
   return (
-    <>
-      <h3
-        style={{
-          fontSize: '1.125rem',
-          display: 'flex',
-          gap: '0.5rem',
-          alignItems: 'center',
-        }}
-      >
-        {' '}
-        <FaChartBar /> Activity
-      </h3>
-      <CommentActivity>
-        <ActivityUser>
-          <FaUser />
-        </ActivityUser>
-        <CommentField type={'text'} placeholder="Comment..." />
-      </CommentActivity>
-      <Activity>
-        <ActivityUser>
-          <FaUser />
-        </ActivityUser>
-        <ActivityText>
+    <Flex maxH={'320px'} overflowY="auto" direction={'column'} gap={4}>
+      <Flex alignItems={'center'} gap={2}>
+        <Heading as="h3" fontSize={'md'}></Heading>
+        <Icon as={FaChartBar} /> Activity
+      </Flex>
+      <Flex gap={2} alignItems={'center'}>
+        <Avatar size={'sm'} />
+        <Input
+          placeholder="Comment..."
+          p={2}
+          w="full"
+          borderRadius={'md'}
+          _focus={{
+            bg: 'white',
+          }}
+        />
+      </Flex>
+      <Flex gap={2} alignItems={'center'}>
+        <Avatar size={'sm'} />
+        <Text px={2} fontSize="sm">
           Hello this is some fancy activity text we can even write very long
           text to see where it goes Hello this is some fancy activity text we
           can even write.
-        </ActivityText>
-      </Activity>
+        </Text>
+      </Flex>
 
-      <Activity>
-        <ActivityUser>
-          <FaUser />
-        </ActivityUser>
-        <ActivityText>
-          Hello this is some fancy activity text we can even write very long
-          text to see where it goes Hello this is some fancy activity text we
-          can even write.
-        </ActivityText>
-      </Activity>
-    </>
+      <Flex gap={2} alignItems={'center'}>
+        <Avatar name={'Ali Adam'} size={'sm'} />
+        <Text px={2} fontSize="sm">
+          Moved this card from First Column to Second Column
+        </Text>
+      </Flex>
+    </Flex>
   );
 }
 

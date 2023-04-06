@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import background from '../../background-example.jpg';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from './column/Column';
 import NewColumn from './column/NewColumn';
@@ -12,24 +11,25 @@ import {
   useUpdateTaskHorizontalOrderMutation,
 } from 'api/ApiSlice';
 import TaskModal from './task/TaskModal';
+import { Flex } from '@chakra-ui/react';
 
-const BoardContainer = styled.div`
-  background-image: url(${(props) => props.imageLink});
-  background-position: center;
-  background-size: cover;
-  margin-top: 64px;
-  height: calc(100vh - 64px);
-  padding-inline: 2rem;
-  padding-block: 0.625rem;
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  align-items: start;
+const _testBackgroundUrl =
+  "url('https://images.unsplash.com/photo-1680675805063-3aa8b3607b0a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80')";
+const containerProps = {
+  backgroundPosition: 'center',
+  backgroundSize: 'cover',
+  mt: 14,
+  h: '92vh',
+  px: 4,
+  py: 4,
+  gap: 2,
+  maxWidth: 'full',
+  maxHeight: 'calc(100vh - 56px)',
+  overflowX: 'auto',
+  alignItems: 'flex-start',
+};
 
-  & > * {
-    flex-shrink: 0;
-  }
-`;
+const BoardContainer = styled.div``;
 
 const ColumnsWrapper = React.memo((props) => {
   const { column, index, boardId } = props;
@@ -132,23 +132,27 @@ function Board() {
             >
               {(provided) => (
                 <BoardContainer
-                  imageLink={background}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  {data.colOrderIds.map((col, idx) => {
-                    const column = data.columns[col];
-                    return (
-                      <ColumnsWrapper
-                        key={column.id}
-                        column={column}
-                        index={idx}
-                        boardId={data.id}
-                      />
-                    );
-                  })}
-                  {provided.placeholder}
-                  <NewColumn handleNewColumn={handleNewColumn} />
+                  <Flex
+                    {...containerProps}
+                    backgroundImage={_testBackgroundUrl}
+                  >
+                    {data.colOrderIds.map((col, idx) => {
+                      const column = data.columns[col];
+                      return (
+                        <ColumnsWrapper
+                          key={column.id}
+                          column={column}
+                          index={idx}
+                          boardId={data.id}
+                        />
+                      );
+                    })}
+                    {provided.placeholder}
+                    <NewColumn handleNewColumn={handleNewColumn} />
+                  </Flex>
                 </BoardContainer>
               )}
             </Droppable>

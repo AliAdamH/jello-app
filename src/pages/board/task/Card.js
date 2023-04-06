@@ -1,55 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import styled from 'styled-components';
+import React, { useMemo, useCallback } from 'react';
 import { Draggable } from '@hello-pangea/dnd';
-import ExpandedCard from './ExpandedCard';
 import { createSelector } from '@reduxjs/toolkit';
 import { useGetBoardTasksQuery } from 'api/ApiSlice';
 import { useDispatch } from 'react-redux';
 import { setOpenTaskId } from 'store/modalSlice';
-// Modal.setAppElement('#root');
-// Modal.defaultStyles.overlay.backgroundColor = 'rgba(0,0,0, 0.6)';
-// Modal.defaultStyles.overlay.overflowY = 'scroll';
+import { Box, Flex } from '@chakra-ui/react';
 
-// const StyledModal = styled(Modal)`
-//   width: min(50vw, 764px);
-//   background-color: #eee;
-//   margin-top: 2rem;
-//   margin-bottom: 3rem;
-//   margin-inline: auto;
-//   min-height: 800px;
-//   border-radius: 0.375rem;
-//   outline: none;
-// `;
-
-const CardContainer = styled.div`
-  border-radius: 0.375rem;
-  border-bottom: 1px solid lightgray;
-  min-height: 64px;
-  height: fit-content;
-  padding: 0.5rem;
-  margin-bottom: 0.375rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  background-color: ${(props) => props.bgColor};
-  color: ${(props) => props.fontColor};
-  cursor: pointer;
-`;
-
-const LabelsContainer = styled.div`
-  display: flex;
-  gap: 0.2rem;
-`;
-
-const Label = styled.div`
-  width: 0.825rem;
-  height: 0.825rem;
-  border-radius: 50%;
-  border: 1px solid ${(props) => props.borderColor};
-  background-color: ${(props) => props.backgroundColor};
-`;
-// { id, index, labels, title, coverColor, coverTextColor }
 const Card = ({ id, index, boardId }) => {
   const dispatch = useDispatch();
   const selectTask = useMemo(() => {
@@ -76,34 +32,46 @@ const Card = ({ id, index, boardId }) => {
   const openModal = useCallback(() => {
     dispatch(setOpenTaskId(id));
   }, [dispatch, id]);
-  const [expanded, setExpanded] = useState(false);
   return (
     <>
       {isSuccess && !isFetching && (
         <Draggable draggableId={String(id)} index={index}>
           {(provided, snapshot) => (
-            <CardContainer
+            <Flex
+              direction={'column'}
+              justifyContent="flex-end"
+              gap={2}
+              p={2}
+              mb={1}
               onClick={openModal}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
+              borderRadius={'md'}
               ref={provided.innerRef}
-              isDragging={snapshot.isDragging}
-              bgColor={task.coverColor}
-              fontColor={task.coverTextColor}
+              skewY={snapshot.isDragging ? '45deg' : '0deg'}
+              minH={16}
+              borderBottom="2px solid lightgray"
+              h={'fit-content'}
+              cursor="pointer"
+              bg={task.coverColor}
+              color={task.coverTextColor}
             >
-              <LabelsContainer>
+              <Flex gap={1}>
                 {Object.keys(task.labels).map((k, _) => {
                   return (
-                    <Label
+                    <Box
                       key={k}
-                      borderColor={task.coverTextColor}
+                      borderRadius="full"
+                      w={3}
+                      h={3}
+                      border={`1px solid ${task.coverTextColor}`}
                       backgroundColor={task.labels[k].color}
                     />
                   );
                 })}
-              </LabelsContainer>
+              </Flex>
               {task.title}
-            </CardContainer>
+            </Flex>
           )}
         </Draggable>
       )}

@@ -5,7 +5,6 @@ import CardActivityFeed from './CardActivityFeed';
 import EditableDescription from './EditableDescription';
 import EditableTitle from './EditableTitle';
 import ExpandedCardActions from './ExpandedCardActions';
-import { taskTitleUpdate } from '../boardSlice';
 import {
   handleTitleChange,
   updateTask,
